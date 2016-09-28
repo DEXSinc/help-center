@@ -1,0 +1,218 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="app-home">
+
+  <template>
+    <link href="/images/iconsets/icons.css" rel="stylesheet" />
+    <style include="app-grid-style">
+      :host {
+        display: block;
+        padding: 0;
+      }
+      .panelcard {
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+      }
+      .card {
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+        /*height: calc(100vh - 97px);*/
+        background: url('/images/it_photo_114994-2.jpg') no-repeat center center;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        /*height: 600px;*/
+        margin: 0;
+        background-color: #fff;
+        /*color: #757575;*/
+        -webkit-filter: blur(0px);
+        -moz-filter: blur(0px);
+        -o-filter: blur(0px);
+        -ms-filter: blur(0px);
+        filter: blur(0px);
+      }
+      .box {
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        background-color: #fff;
+        border-radius: 5px;
+        margin: 10px;
+      }
+      .knowledge-panel {
+        /*color: #fff;*/
+        @apply(--layout-self-center);
+        width: 50%;
+        min-width: 550px;
+      }
+      .knowledge-caption {
+        @apply(--paper-font-body2);
+        padding: 1em 0;
+      }
+      h1 {
+        @apply(--paper-font-display2);
+        /*text-align: center;*/
+        width: 100%;
+        /*font-size: 22px;
+        margin: 16px 0;*/
+        /*color: #333;*/
+      }
+      paper-search-input {
+        width: 100%;
+      }
+      terminal-text {
+        --terminal-text-text-color0: #fff;
+        --terminal-text-pre-text-color0: #fff;
+        --terminal-text-cursor-color0: #fff;
+        font-size: 1em;
+      }
+      .icon-row {
+        margin: auto;
+        width: 75%;
+      }
+      .col-md-4 {
+        width: 323px;
+        height: 244px;
+        padding-left: 15px;
+        padding-right: 15px;
+        line-height: 20px;
+        float: left;
+      }
+      .category {
+        text-align: center;
+      }
+      .category:hover .icons-home {
+        background-repeat: no-repeat;
+        -webkit-filter: saturate(150%);
+        -moz-filter: saturate(150%);
+        -o-filter: saturate(150%);
+        filter: saturate(150%);
+        transform: scale(1.1);
+      }
+      .icons-home {
+        background-repeat: no-repeat;
+        background-size: 140px;
+        width: 140px;
+        height: 140px;
+        display: block;
+        margin: 0 auto;
+        -webkit-transition: width 0.4s, height 0.4s, background-color 0.4s, transform 0.4s;
+        -moz-transition: width 0.4s, height 0.4s, background-color 0.4s, transform 0.4s;
+        -ms-transition: width 0.4s, height 0.4s, background-color 0.4s, transform 0.4s;
+        -o-transition: width 0.4s, height 0.4s, background-color 0.4s, transform 0.4s;
+        transition: width 0.4s, height 0.4s, background-color 0.4s, transform 0.4s;
+      }
+      .titles-home a {
+        @apply(--paper-font-headline);
+        text-decoration: none;
+        color: var(--app-secondary-color);
+      }
+      .icons-home svg path {
+        fill: black !important;
+      }
+    </style>
+
+    <div class="card">
+      <div class="knowledge-panel">
+        <h1>How can we help you today?</h1>
+        <paper-search-input>
+          <terminal-text 
+            clear-delay="1000"
+            back-delay="10"
+            blink-speed="250"
+            cursor="│"
+            delay="10"
+            prefix="{{prefixText}}" 
+            text="{{terminalTextItems}}" 
+            value="{{terminalOutput}}"></terminal-text>
+        </paper-search-input>
+        <p class="knowledge-caption">The help center gives you quick access to settings and tools that let you review your data, protect your privacy, and decide how your information can make Acquisio services work better for you.</p>
+      </div>
+    </div>
+
+    <div class="panelcard">
+      <div class="layout horizontal wrap end-justified">
+
+        <!-- Getting Started -->
+        <div class="box col-md-4">
+          <div class="category">
+              <a href="#/articles/000002271"><i class="icons-home icons-getting-started"></i></a>
+              <div class="titles-home">
+                  <a href="#/articles/000002271">Getting Started</a>
+                  <p>New to Acquisio? Click here for a quick start.</p>
+              </div>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="box col-md-4">
+          <div class="category">
+              <a href="#/faqs/"><i class="icons-home icons-faq"></i></a>
+              <div class="titles-home">
+                  <a href="#/faqs/">FAQ</a>
+                  <p>Browse our Frequently Asked Questions.</p>
+              </div>
+          </div>
+        </div>
+
+        <!-- Video Library -->
+        <div class="box col-md-4">
+          <div class="category">
+              <a href="#/videos/"><i class="icons-home icons-video-library"></i></a>
+              <div class="titles-home">
+                  <a href="#/videos/">Video Library</a>
+                  <p>Browse and watch our many awesome videos from our library.</p>
+              </div>
+          </div>
+        </div>
+    </div>
+  </div>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'app-home',
+      properties: {
+        terminalTextItems: {
+          type: Array,
+          value: function() {
+            return [
+              'Search^250.^150.^150.^1000',
+              'Link an MCC^1000',
+              'Custom Reporting^1000',
+              'Clone-Sync^1000',
+              'Campaign management^1000',
+              'BBM^1000'
+            ];
+          }
+        },
+        prefixText: {
+          type: String,
+          value: '',
+          notify: true
+        },
+        terminalOutput: {
+          type: String,
+          value: '',
+          notify: true
+        }
+      }
+
+    });
+
+  </script>
+
+</dom-module>
