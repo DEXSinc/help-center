@@ -26,6 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         border-radius: 5px;
         background-color: #fff;
         color: #757575;
+        min-height: calc(90vh - 100px);
       }
 
       .title {
@@ -44,7 +45,45 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           width: 100%;
         }
       }
+      #app-spinner {
+        position: absolute;
+        left: 50%;
+        top: 33%;
+        -webkit-transform: translateX(-50%);
+        -moz-transform: translateX(-50%);
+        -ms-transform: translateX(-50%);
+        -o-transform: translateX(-50%);
+        transform: translateX(-50%);
+        -webkit-transition: visibility 0.6s, all 0.6s;
+        -moz-transition: visibility 0.6s, all 0.6s;
+        -ms-transition: visibility 0.6s, all 0.6s;
+        -o-transition: visibility 0.6s, all 0.6s;
+        transition: visibility 0.6s, all 0.6s;
+      }
 
+      paper-spinner.blue {
+        height: 100px;
+        width: 100px;
+        --paper-spinner-stroke-width: 2px;
+        --paper-spinner-layer-1-color: var(--acquisio-blue-100);
+        --paper-spinner-layer-2-color: var(--acquisio-blue-900);
+        --paper-spinner-layer-3-color: var(--acquisio-blue-100);
+        --paper-spinner-layer-4-color: var(--acquisio-blue-900);
+        --paper-spinner-color: var(--acquisio-blue-100);
+      }
+
+      @media only screen and (max-width: 800px) {
+        #app-spinner {
+          position: absolute;
+          top: 30%;
+          left: 50%;
+          -webkit-transform: translateY(-30%) translateX(-50%);
+          -moz-transform: translateY(-30%) translateX(-50%);
+          -ms-transform: translateY(-30%) translateX(-50%);
+          -o-transform: translateY(-30%) translateX(-50%);
+          transform: translateY(-30%) translateX(-50%);
+        }
+      }
     </style>
 
     <app-route
@@ -54,7 +93,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </app-route>
 
     <iron-ajax id="articleFeed"
-           url="https://account.acquisio.com/services/api/v1/articles/{{articleId}}"
+           url="https://localhost.acquisio.com/services/api/v1/articles/{{articleId}}"
            method="GET"
            auto
            last-response="{{article}}"
@@ -63,18 +102,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     
     <iron-media-query query="(min-width: 900px)" query-matches="{{wide}}"></iron-media-query>
 
-    <div class="card layout vertical item" wide-layout$="{{wide}}">
-
-        <div class="title self-center">@Model.Title {{articleId}}</div>
-        <marked-element id="dialogMarkdown">
-            <div class="markdown-html"></div>
-            <script type="text/markdown">
-                @Html.Raw(Content)
-            </script>
-        </marked-element>
-
+    <div id="app-spinner" hidden$="{{!articleLoading}}">
+      <paper-spinner class="blue" active></paper-spinner>
     </div>
 
+    <div class="card layout vertical item" wide-layout$="{{wide}}">
+      <div class="title self-center" hidden$="{{articleLoading}}">{{article.Title}}</div>
+      <div id="articleContent" hidden$="{{articleLoading}}"></div>
+    </div>
   </template>
 
   <script>
@@ -105,19 +140,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         article: {
           type: Object,
           value: function() {
-            return {};
+            return {
+              Title: '',
+              Article_Text__c: ''
+            };
           }
         },
+        articleContent: {
+          type: String,
+          value: ''
+        },
         articleLoading: {
+          type: Boolean,
+          value: true
+        },
+        isLoading: {
           type: Boolean,
           value: true
         }
       },
       observers: [
-        '_articleDataIdChanged(articleData.id)'
+        '_articleDataIdChanged(articleData.id)',
+        '_articleContentChanged(article.Article_Text__c)'
       ],
       _subRouteChanged: function(n,o) {
         //console.log(n);
+      },
+      _articleContentChanged: function(c) {
+        if (!!c == true) {
+          this.$.articleContent.innerHTML = c.replaceAll('~', '#');
+        } else {
+          this.$.articleContent.innerHTML = '';
+        }
       },
       _articleDataChanged: function(n,o) {
         //console.log(n);

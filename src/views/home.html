@@ -4,7 +4,7 @@
 
   <template>
     <link href="/images/iconsets/icons.css" rel="stylesheet" />
-    <style include="app-grid-style">
+    <style include="app-grid-style iron-flex iron-flex-alignment">
       :host {
         display: block;
         padding: 0;
@@ -12,11 +12,12 @@
       .panelcard {
         @apply(--layout-vertical);
         @apply(--layout-center);
+        padding: 20px;
       }
       .card {
         @apply(--layout-vertical);
         @apply(--layout-center);
-        background: url('/images/it_photo_114994-2.jpg') no-repeat center center;
+        background: url('/images/125498252.jpg') no-repeat center center;
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
@@ -103,12 +104,117 @@
       .icons-home svg path {
         fill: black !important;
       }
+      video { 
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        z-index: -100;
+        transform: translateX(-50%) translateY(-50%);
+        background: url('//demosthenes.info/assets/images/polina.jpg') no-repeat;
+        background-size: cover;
+        transition: 1s opacity;
+      }
+      .videos-list {
+        padding: 10px;
+        display: block;
+        width: 360px;
+        height: auto;
+        padding-top: 30px;
+      }
+
+      paper-card.first {
+          border-top: solid 4px #34b6e4;
+          -ms-border-radius: 0;
+          border-radius: 0;
+          padding-bottom: 10px;
+          width: 360px;
+      }
+
+      paper-card.second {
+          border-top: solid 4px #0c4c8a;
+          -ms-border-radius: 0;
+          border-radius: 0;
+          padding-bottom: 10px;
+          width: 360px;
+      }
+
+      paper-card.third {
+          border-top: solid 4px #fe7701;
+          -ms-border-radius: 0;
+          border-radius: 0;
+          padding-bottom: 10px;
+          width: 360px;
+      }
+
+      .box-title {
+          @apply(--paper-font-title);
+          margin-left: 10px;
+          margin-top: 10px;
+          color: #6a737b;
+          background-color: #fff;
+          width: 350px;
+      }
+
+      wistia-video-list {
+          width: 360px;
+      }  
+      paper-dialog {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        margin: 0;
+        height: calc(100vh);
+      }
+      paper-dialog-scrollable {
+        height: calc(100% - 128px); /* 128 seemed to account for the header and footer */
+      }
+      paper-dialog-scrollable #scrollable {
+        max-height: 100%;
+      }
     </style>
+
+    <iron-ajax id="videoSearchFeed"
+              url="{{serviceUrl}}/services/api/v1/articles/search"
+              method="GET"
+              params="[[_getParams(searchValue,4)]]"
+              last-response="{{videoSearchResult}}"
+              loading="{{videosLoading}}"
+              on-request="_clearVideos"
+              on-response="_onVideoSearchResult"></iron-ajax>
+    <iron-ajax id="articleSearchFeed"
+              url="{{serviceUrl}}/services/api/v1/articles/search"
+              method="GET"
+              params="[[_getParams(searchValue,0)]]"
+              last-response="{{articleResult}}"
+              loading="{{articlesLoading}}"
+              on-request="_clearArticles"
+              on-response="_onArticleSearchResult"></iron-ajax>
+    <iron-ajax id="faqSearchFeed"
+              url="{{serviceUrl}}/services/api/v1/articles/search"
+              method="GET"
+              params="[[_getParams(searchValue,2)]]"
+              last-response="{{faqResult}}"
+              loading="{{faqsLoading}}"
+              on-request="_clearFaqs"
+              on-response="_onFaqSearchResult"></iron-ajax>
+    <iron-ajax id="articleService"
+              url="{{serviceUrl}}/services/api/v1/articles/{{articleNumber}}"
+              method="GET"
+              last-response="{{currentArticle}}"
+              loading="{{articleLoading}}"
+              on-request="_clearArticle"
+              on-response="_onLoadArticle"></iron-ajax>
 
     <div class="card">
       <div class="knowledge-panel">
         <h1>How can we help you today?</h1>
-        <paper-search-input>
+        <paper-search-input id="knowledgeSearch" value="{{searchValue}}" on-value-changed="_onSearchValueChanged" on-value-cleared="_clearSearchResults">
           <terminal-text 
             clear-delay="1000"
             back-delay="10"
@@ -123,8 +229,8 @@
       </div>
     </div>
 
-    <div class="panelcard">
-      <div class="layout horizontal wrap end-justified">
+    <div class="panelcard layout vertical center">
+      <div class="layout horizontal center-justified wrap">
 
         <!-- Getting Started -->
         <div class="box col-md-4">
@@ -160,6 +266,89 @@
         </div>
     </div>
   </div>
+
+    <div class="panelcard layout vertical center">
+      <div class="layout horizontal center-justified wrap">
+
+            <div class="videos-list">
+                <paper-card class="first">
+                    <div class="layout vertical">
+                        <div class="box-title">Videos</div>
+                        <div style="padding: 10px; color: #6a737b;" hidden$="[[!videosLoading]]">Loading...</div>
+                        <wistia-video-list hidden$="[[videosLoading]]" videos='[[videoResults]]' max-items="4"></wistia-video-list>
+                        <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(videoResults,videosLoading)]]">No videos found</div>
+                        <div class="layout horizontal end-justified">
+                            <paper-button hidden>More</paper-button>
+                        </div>
+                    </div>
+                </paper-card>
+            </div>
+
+            <div class="videos-list">
+                <paper-card class="second">
+                    <div class="layout vertical">
+                        <div class="box-title">Frequently Asked Questions</div>
+                        <div style="padding: 10px; color: #6a737b;" hidden$="[[!faqsLoading]]">Loading...</div>
+                        <div style="padding: 10px;" hidden$="[[isEmpty(faqResult,faqsLoading)]]">
+                            <paper-listbox id="faqListbox" items="[[faqResult]]">
+                                <template is="dom-repeat" items="[[getItems(faqResult,faqLimit)]]">
+                                    <faq-item question="[[item.Title]]" category="[[item.Category]]" last-modified="[[item.LastModifiedDate]]">
+                                        <marked-element markdown="[[item.Content]]">
+                                        </marked-element>
+                                    </faq-item>
+                                </template>
+                            </paper-listbox>
+                        </div>
+                        <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(faqResult,faqsLoading)]]">No FAQs found</div>
+                        <div class="layout horizontal end-justified">
+                            <paper-button on-click="showLessFaqs" hidden$="[[!showLess(defaultFaqLimit,faqLimit)]]">Less</paper-button>
+                            <paper-button on-click="addMoreFaqs" hidden$="[[!showMore(faqResult,faqLimit)]]">More</paper-button>
+                        </div>
+                    </div>
+                </paper-card>
+            </div>
+
+            <div class="videos-list">
+                <paper-card class="third">
+                    <div class="layout vertical">
+                        <div class="box-title">Articles</div>
+                        <div style="padding: 10px; color: #6a737b;" hidden$="[[!articlesLoading]]">Loading...</div>
+                        <div style="padding: 10px;" hidden$="[[isEmpty(articleResult,articlesLoading)]]">
+                            <paper-listbox id="articleListbox" items="[[articleResult]]">
+                                <template is="dom-repeat" items="[[getItems(articleResult,articleLimit)]]">
+                                    <paper-item alt="[[item.Title]]" role="listitem" on-click="openArticle">
+                                        <paper-item-body two-line>
+                                            <div>[[item.Title]]</div>
+                                            <div secondary>Last Modified: [[formatHuman(item.LastModifiedDate)]]</div>
+                                        </paper-item-body>
+                                        <iron-icon icon="mdi:file-document-box"></iron-icon>
+                                    </paper-item>
+                                </template>
+                            </paper-listbox>
+                        </div>
+                        <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(articleResult,articlesLoading)]]">No articles found</div>
+                        <div class="layout horizontal end-justified">
+                            <paper-button on-click="showLessArticles" hidden$="[[!showLess(defaultArticleLimit,articleLimit)]]">Less</paper-button>
+                            <paper-button on-click="addMoreArticles" hidden$="[[!showMore(articleResult,articleLimit)]]">More</paper-button>
+                        </div>
+                    </div>
+                </paper-card>
+            </div>
+      </div>
+    </div>
+    
+    <paper-dialog always-on-top class="fullscreen" id="animated" entry-animation="scale-up-animation" exit-animation="fade-out-animation">
+        <h2>{{sanitizedArticle.Title}}</h2>
+        <paper-dialog-scrollable>
+            <marked-element id="dialogMarkdown" markdown="{{sanitizedArticle.Article_Text__c}}">
+                <div class="markdown-html"></div>
+            </marked-element>
+        </paper-dialog-scrollable>
+        <div class="buttons">
+            <paper-button dialog-dismiss>Close</paper-button>
+        </div>
+    </paper-dialog>
+
   </template>
 
   <script>
@@ -168,6 +357,50 @@
 
       is: 'app-home',
       properties: {
+        serviceUrl: {
+          type: String,
+          value: 'https://localhost.acquisio.com'
+        },
+        articleLimit: { 
+          type: Number,
+          value: 6
+        },
+        faqLimit: { 
+          type: Number,
+          value: 6
+        },
+        videoLimit: { 
+          type: Number,
+          value: 4
+        },
+        defaultArticleLimit: { 
+          type: Number,
+          value: 6
+        },
+        defaultFaqLimit: { 
+          type: Number,
+          value: 6
+        },
+        defaultVideoLimit: { 
+          type: Number,
+          value: 4
+        },
+        currentArticle: {
+          type: Object,
+          value: function() {
+            return {};
+          }
+        },
+        sanitizedArticle: {
+          type: Object,
+          value: function() {
+            return {};
+          }
+        },
+        searchValue: {
+          type: String,
+          value: ''
+        },
         terminalTextItems: {
           type: Array,
           value: function() {
@@ -191,10 +424,121 @@
           value: '',
           notify: true
         }
+      },
+      expandPath: function(html) {
+        var patt = /~/igm;
+        return html.replace(patt, '#');
+      },
+      _clearSearchResults: function(e) {
+        console.log(e);
+      },
+      _onSearchValueChanged: function(e) {
+        console.log(e);
+      },
+      _getParams: function(s, i) {
+        var o = { 
+          keyword: s,
+          type: i 
+        };
+        return o;
+      },
+      isEmpty: function(arr, loading) {
+        return !loading && _.isEmpty(arr);
+      },
+      getItems: function(l, c) {
+        return l.slice(0, c);
+      },
+      addMoreArticles: function() {
+        this.articleLimit += 5;
+      },
+      showLessArticles: function() {
+        var x = this.articleLimit - 5;
+        this.articleLimit = Math.max(this.defaultArticleLimit, x);
+      },
+      addMoreFaqs: function() {
+        this.faqLimit += 5;
+      },
+      showLessFaqs: function() {
+        var x = this.faqLimit - 5;
+        this.faqLimit = Math.max(this.defaultFaqLimit, x);
+      },
+      showMore: function(l, c) {
+        // list is empty return false
+        // list count <= limit return false
+        if (!!!l) return false;
+        if (l.length <= c) return false;
+        return true;
+      },
+      showLess: function(i, c) {
+        // list is empty return false
+        // list count <= limit return false
+        if (c > i) return true;
+        return false;
+      },
+      _onLoadArticle: function() {
+        var sa = this.currentArticle;
+        var at = this.expandPath(sa.Article_Text__c);
+        sa.Article_Text__c = at;
+        this.sanitizedArticle = sa;
+        this.$.dialogMarkdown.render();
+        this.$.animated.open();
+      },
+      _clearVideos: function() {
+        this.set('videoResults', []);
+      },
+      _clearFaqs: function() {
+        this.set('faqResult', []);
+      },
+      _clearArticle: function() {
+      },
+      _clearArticles: function() {
+        this.set('articleResult', []);
+      },
+      _clearAllSearchResults: function() {
+        this._clearVideos();
+        this._clearFaqs();
+        this._clearArticles();
+      },
+      _onFaqSearchResult: function(a) {
+        // do something...
+      },
+      _onArticleSearchResult: function(a) {
+        // do something...
+      },
+      openArticle: function(i) {
+        this.$.articleListbox.selected = -1;
+        this.$.faqListbox.selected = -1;
+        if (!!!i || !!!i.model || !!!i.model.item) return;
+        console.log(i.model.item);
+        this.articleNumber = i.model.item.ArticleNumber;
+        this.$.articleService.generateRequest();
+      },
+      _onVideoSearchResult: function(a, b, c) {
+          this.videoResults = _.map(this.videoSearchResult, function(vsr) { return { videoId: vsr.VideoId }; });
+          this.hasVideoResults = this.videoResults.length > 0;
+      },
+      _resetLimits: function() {
+        this.articleLimit = this.defaultArticleLimit;
+        this.faqLimit = this.defaultFaqLimit;
+        this.videoLimit = this.defaultVideoLimit;
+      },
+      formatHuman: function(d) {
+        return moment(d).fromNow();
+      },
+      ready: function() {
+        var app = this;
+        //this.$.animated.positionTarget = document.querySelector('body');
+        document.addEventListener("paper-search-input-execute", function(e) {
+          app.$.videoSearchFeed.generateRequest();
+          app.$.faqSearchFeed.generateRequest();
+          app.$.articleSearchFeed.generateRequest();
+          app.$.articleListbox.selected = -1;
+          app.$.faqListbox.selected = -1;
+          app._resetLimits();
+        });
       }
-
     });
-
+    
   </script>
 
 </dom-module>

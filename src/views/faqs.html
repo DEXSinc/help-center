@@ -26,6 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         border-radius: 5px;
         background-color: #fff;
         color: #757575;
+        min-height: calc(90vh - 100px);
       }
       .circle {
         display: inline-block;
@@ -38,17 +39,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #555;
         text-align: center;
       }
+
       h1 {
         font-size: 22px;
         margin: 16px 0;
         color: #212121;
       }
+
       faq-item {
           --faq-question-item: {
+              @apply(--paper-font-body2);
               cursor: pointer;
           };
 
           --faq-answer-item: {
+              @apply(--paper-font-body1);
               overflow: hidden;
               background-color: white;
           };
@@ -60,7 +65,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .videos-list {
-          padding: 5px;
+          padding: 10px;
           display: block;
           width: 360px;
           min-height: 400px;
@@ -109,6 +114,46 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               width: 100%;
           }
       }
+
+      #app-spinner {
+        position: absolute;
+        left: 50%;
+        top: 33%;
+        -webkit-transform: translateX(-50%);
+        -moz-transform: translateX(-50%);
+        -ms-transform: translateX(-50%);
+        -o-transform: translateX(-50%);
+        transform: translateX(-50%);
+        -webkit-transition: visibility 0.6s, all 0.6s;
+        -moz-transition: visibility 0.6s, all 0.6s;
+        -ms-transition: visibility 0.6s, all 0.6s;
+        -o-transition: visibility 0.6s, all 0.6s;
+        transition: visibility 0.6s, all 0.6s;
+      }
+
+      paper-spinner.blue {
+        height: 100px;
+        width: 100px;
+        --paper-spinner-stroke-width: 2px;
+        --paper-spinner-layer-1-color: var(--acquisio-blue-100);
+        --paper-spinner-layer-2-color: var(--acquisio-blue-900);
+        --paper-spinner-layer-3-color: var(--acquisio-blue-100);
+        --paper-spinner-layer-4-color: var(--acquisio-blue-900);
+        --paper-spinner-color: var(--acquisio-blue-100);
+      }
+
+      @media only screen and (max-width: 800px) {
+        #app-spinner {
+          position: absolute;
+          top: 30%;
+          left: 50%;
+          -webkit-transform: translateY(-30%) translateX(-50%);
+          -moz-transform: translateY(-30%) translateX(-50%);
+          -ms-transform: translateY(-30%) translateX(-50%);
+          -o-transform: translateY(-30%) translateX(-50%);
+          transform: translateY(-30%) translateX(-50%);
+        }
+      }
     </style>
 
     <app-route
@@ -117,7 +162,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         data="{{articleData}}">
     
     <iron-ajax id="faqSearchFeed"
-           url="https://account.acquisio.com/services/api/v1/faqs/{{category}}"
+           url="https://localhost.acquisio.com/services/api/v1/faqs/{{category}}"
            method="GET"
            auto
            last-response="{{faqResult}}"
@@ -125,10 +170,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
            on-response="_onFaqsResult"></iron-ajax>
 
     <iron-media-query query="(min-width: 600px)" query-matches="{{queryMatches}}"></iron-media-query>
+    
+    <div id="app-spinner" hidden$="{{!faqsLoading}}">
+      <paper-spinner class="blue" active></paper-spinner>
+    </div>
 
     <div class="card layout vertical center">
         <div class="page-title">Frequently Asked Questions</div>
         <div class="layout horizontal center-justified wrap">
+
+            <paper-header-panel style="height: 100px;" mode="cover">
+                <div class="paper-header">Header</div>
+                <div>Content goes here...</div>
+            </paper-header-panel>
             <template is="dom-repeat" items="[[faqResult]]" as="faqGroup">
                 <div class$="videos-list [[_elevated(queryMatches)]]">
                     <paper-card class$="faq-group-[[index]]" elevation="[[_getElevation(queryMatches)]]">

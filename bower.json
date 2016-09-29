@@ -26,12 +26,16 @@
     "wistia-video": "^1.0.2",
     "faq-item": "vic10us/faq-item#master",
     "paper-listbox": "^1.1.2",
-    "marked-element": "^1.2.0"
+    "marked-element": "^1.2.0",
+    "paper-spinner": "^1.2.0",
+    "paper-header-panel": "^1.1.6",
+    "lodash": "^4.16.2"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
   },
   "resolutions": {
-    "polymer": "^1.7.0"
+    "polymer": "^1.7.0",
+    "lodash": "^4.16.2"
   }
 }
