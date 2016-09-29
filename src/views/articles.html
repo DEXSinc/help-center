@@ -14,7 +14,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <template>
 
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
         padding: 0;
@@ -27,22 +27,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background-color: #fff;
         color: #757575;
       }
-      .grey-circle {
-        display: inline-block;
-        height: 64px;
-        width: 64px;
-        border-radius: 50%;
-        background: #ddd;
-        line-height: 64px;
-        font-size: 30px;
-        color: #555;
-        text-align: center;
+
+      .title {
+        @apply(--paper-font-title);
+        padding-bottom: 20px;
       }
-      h1 {
-        font-size: 22px;
-        margin: 16px 0;
-        color: #212121;
+      .item .article {
+        width: 90%;
+        @apply(--paper-font-body2);
       }
+      .item[wide-layout] .article {
+        max-width: 840px;
+      }
+      @media only screen and (max-width: 900px) {
+        .article {
+          width: 100%;
+        }
+      }
+
     </style>
 
     <app-route
@@ -50,11 +52,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         pattern="/:id"
         data="{{articleData}}">
     </app-route>
-    <div class="card">
-      <div class="grey-circle">1</div>
-      <h1>Article: {{articleId}}</h1>
-      <p>Ut labores minimum atomorum pro. Laudem tibique ut has.
-      <p>Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Cu mei vide viris gloriatur, at populo eripuit sit.</p>
+
+    <iron-ajax id="articleFeed"
+           url="https://account.acquisio.com/services/api/v1/articles/{{articleId}}"
+           method="GET"
+           auto
+           last-response="{{article}}"
+           loading="{{articleLoading}}"
+           on-response="_onArticleResult"></iron-ajax>
+    
+    <iron-media-query query="(min-width: 900px)" query-matches="{{wide}}"></iron-media-query>
+
+    <div class="card layout vertical item" wide-layout$="{{wide}}">
+
+        <div class="title self-center">@Model.Title {{articleId}}</div>
+        <marked-element id="dialogMarkdown">
+            <div class="markdown-html"></div>
+            <script type="text/markdown">
+                @Html.Raw(Content)
+            </script>
+        </marked-element>
+
     </div>
 
   </template>
@@ -83,6 +101,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: String,
           value: '',
           reflectToAttribute: true
+        },
+        article: {
+          type: Object,
+          value: function() {
+            return {};
+          }
+        },
+        articleLoading: {
+          type: Boolean,
+          value: true
         }
       },
       observers: [
@@ -97,6 +125,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _articleDataIdChanged: function(n){
         // console.log(n);
         this.articleId = n;
+      },
+      _onArticleResult: function(a) {
+        console.log(a);
       }
 
     });

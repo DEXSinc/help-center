@@ -14,7 +14,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <template>
 
-    <style>
+    <style is="custom-style" include="paper-item-shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
         padding: 10px;
@@ -43,18 +43,114 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin: 16px 0;
         color: #212121;
       }
+      faq-item {
+          --faq-question-item: {
+              cursor: pointer;
+          };
+
+          --faq-answer-item: {
+              overflow: hidden;
+              background-color: white;
+          };
+      }
+
+      faq-item * img {
+          width: 16px;
+          height: 16px;
+      }
+
+      .videos-list {
+          padding: 5px;
+          display: block;
+          width: 360px;
+          min-height: 400px;
+          /*height: auto;*/
+          padding-top: 32px;
+      }
+
+      paper-card {
+          border-top: solid 4px #34b6e4;
+          -ms-border-radius: 0;
+          border-radius: 0;
+          width: 360px;
+      }
+
+      paper-card.faq-group-0 {
+          border-top: solid 4px #fe7701;
+      }
+
+      paper-card.faq-group-1 {
+          border-top: solid 4px #0c4c8a;
+      }
+
+      .box-title {
+          @apply(--paper-font-title);
+          margin-left: 10px;
+          margin-top: 10px;
+          color: #6a737b;
+          background-color: #fff;
+          width: 350px;
+      }
+
+      .page-title {
+          @apply(--paper-font-display1);
+          padding-top: 32px;
+      }
+
+      @media only screen and (max-width: 600px) {
+          .videos-list {
+              width: 100%;
+              padding-left: 0;
+              padding-right: 0;
+          }
+
+          paper-card {
+              margin: 0;
+              width: 100%;
+          }
+      }
     </style>
+
     <app-route
         route="{{subRoute}}"
         pattern="/:id"
         data="{{articleData}}">
-    <div class="card">
-      <div class="circle">2</div>
-      <h1>Frequently Asked Questions: {{category}}</h1>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.</p>
-      <p>Id nam odio natum malorum, tibique copiosae expetenda mel ea.Detracto suavitate repudiandae no eum. Id adhuc minim soluta nam.Id nam odio natum malorum, tibique copiosae expetenda mel ea.</p>
-    </div>
+    
+    <iron-ajax id="faqSearchFeed"
+           url="https://account.acquisio.com/services/api/v1/faqs/{{category}}"
+           method="GET"
+           auto
+           last-response="{{faqResult}}"
+           loading="{{faqsLoading}}"
+           on-response="_onFaqsResult"></iron-ajax>
 
+    <iron-media-query query="(min-width: 600px)" query-matches="{{queryMatches}}"></iron-media-query>
+
+    <div class="card layout vertical center">
+        <div class="page-title">Frequently Asked Questions</div>
+        <div class="layout horizontal center-justified wrap">
+            <template is="dom-repeat" items="[[faqResult]]" as="faqGroup">
+                <div class$="videos-list [[_elevated(queryMatches)]]">
+                    <paper-card class$="faq-group-[[index]]" elevation="[[_getElevation(queryMatches)]]">
+                        <div class="layout vertical">
+                            <div class="box-title">[[faqGroup.Category]]</div>
+                            <div style="height: 320px; padding-top: 10px; margin: 0;">
+                                <iron-list style="height: 100%;" items="[[faqGroup.FAQs]]" as="faq">
+                                    <template>
+                                        <faq-item question="[[faq.Question]]" category="[[faq.Category]]" last-modified="[[faq.LastModified]]">
+                                            <marked-element markdown="[[faq.Answer]]">
+                                                <div class="markdown-html"></div>
+                                            </marked-element>
+                                        </faq-item>
+                                    </template>
+                                </iron-list>
+                            </div>
+                        </div>
+                    </paper-card>
+                </div>
+            </template>
+        </div>
+    </div>
   </template>
 
   <script>
@@ -66,6 +162,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         category: {
           type: String,
           value: ''
+        },
+        faqsLoading: {
+          type: Boolean,
+          value: false
+        },
+        queryMatches: {
+          type: Boolean,
+          value: false
+        },
+        faqResult: {
+          type: Array,
+          value: function() {
+            return [];
+          }
         }
       },
       observers: [
@@ -73,6 +183,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       ],
       _articleDataIdChanged: function(id) {
         this.category = id;
+      },
+      _onFaqsResult: function (r) {
+        console.log(r);
+      },
+      _elevated: function (b) {
+        return b ? 'elevated' : '';
+      },
+      _getElevation: function (b) {
+        return b ? 1 : 0;
       }
 
     });
