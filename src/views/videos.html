@@ -14,7 +14,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <template>
 
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
         padding: 10px;
@@ -23,33 +23,166 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
         padding: 16px;
         margin: 24px;
-        border-radius: 5px;
+        /*border-radius: 5px;*/
         background-color: #fff;
         color: #757575;
+        min-height: calc(90vh - 100px);
       }
-      .circle {
-        display: inline-block;
-        height: 64px;
-        width: 64px;
-        border-radius: 50%;
-        background: #ddd;
-        line-height: 64px;
-        font-size: 30px;
-        color: #555;
-        text-align: center;
+
+      .title {
+        @apply(--paper-font-display1);
+        @apply(--self-center);
+        padding-bottom: 40px;
       }
+
       h1 {
         font-size: 22px;
         margin: 16px 0;
         color: #212121;
       }
+
+      #app-spinner {
+        position: absolute;
+        left: 50%;
+        top: 33%;
+        -webkit-transform: translateX(-50%);
+        -moz-transform: translateX(-50%);
+        -ms-transform: translateX(-50%);
+        -o-transform: translateX(-50%);
+        transform: translateX(-50%);
+        -webkit-transition: visibility 0.6s, all 0.6s;
+        -moz-transition: visibility 0.6s, all 0.6s;
+        -ms-transition: visibility 0.6s, all 0.6s;
+        -o-transition: visibility 0.6s, all 0.6s;
+        transition: visibility 0.6s, all 0.6s;
+      }
+
+      paper-spinner.blue {
+        height: 100px;
+        width: 100px;
+        --paper-spinner-stroke-width: 2px;
+        --paper-spinner-layer-1-color: var(--acquisio-blue-100);
+        --paper-spinner-layer-2-color: var(--acquisio-blue-900);
+        --paper-spinner-layer-3-color: var(--acquisio-blue-100);
+        --paper-spinner-layer-4-color: var(--acquisio-blue-900);
+        --paper-spinner-color: var(--acquisio-blue-100);
+      }
+      .video-section {
+        border-top: 1px solid lightgrey;
+        /*border-bottom: 1px solid lightgrey;*/
+        padding: 20px;
+        margin: 0 -16px;
+      }
+      .more-button {
+        width: 200px;
+        height: 113px;
+        margin: 10px;
+        border: 1px solid var(--acquisio-grey-100);
+      }
+      .video-section-title {
+        @apply(--paper-font-title);
+        @apply(--layout-vertical)
+        @apply(--self-center);
+        /*width: 100%;*/
+      }
+      .more-button paper-button {
+        --paper-button: {
+            @apply(--layout-vertical);
+            @apply(--layout-center-center);
+        };
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        vertical-align: middle;
+      }
+
+      @media only screen and (max-width: 600px) {
+        .more-button {
+            width: 100%;
+            height: inherit;
+        }
+        #app-spinner {
+          position: absolute;
+          top: 30%;
+          left: 50%;
+          -webkit-transform: translateY(-30%) translateX(-50%);
+          -moz-transform: translateY(-30%) translateX(-50%);
+          -ms-transform: translateY(-30%) translateX(-50%);
+          -o-transform: translateY(-30%) translateX(-50%);
+          transform: translateY(-30%) translateX(-50%);
+        }
+        :host {
+          margin: 0;
+          padding: 0;
+        }
+        .card {
+          box-shadow: none;
+          padding: 10px;
+          margin: 0;
+          border-radius: 0;
+          background-color: #fff;
+          color: #757575;
+          min-height: calc(100vh - 84px);
+        }
+        .video-section {
+          margin: -10px;
+        }
+
+      }      
     </style>
 
-    <div class="card">
-      <div class="circle">3</div>
-      <h1>Video Library</h1>
-      <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</p>
+    <app-route
+        route="{{subRoute}}"
+        pattern="/:id"
+        data="{{routeData}}">
+    </app-route>
+
+    <iron-ajax id="essentialsVideos"
+              method="GET"
+              url="[[servicesApiRoot]]/api/v1/videos/acquisio_essentials"
+              last-response="{{essentialsVideos}}"
+              withCredentials
+              handle-as="json"
+              auto
+              loading="{{videosLoading}}"
+              content-type="application/json"></iron-ajax>
+
+    <iron-ajax id="fundamentialsVideos"
+              method="GET"
+              url="[[servicesApiRoot]]/api/v1/videos/fundamentals_videos"
+              last-response="{{allFundamentalsVideos}}"
+              withCredentials
+              handle-as="json"
+              auto
+              loading="{{videosLoading}}"
+              on-response="loadedFundamentals"
+              content-type="application/json"></iron-ajax>
+
+    <iron-media-query query="(min-width: 600px)" query-matches="{{wide}}"></iron-media-query>
+
+    <div id="app-spinner" hidden$="{{!videosLoading}}">
+      <paper-spinner class="blue" active></paper-spinner>
+    </div>
+
+    <div class="card layout vertical item" wide-layout$="{{wide}}">
+      <div class="title self-center">{{title}}</div>
+        <div class="video-section">
+          <div class="video-section-title">Acquisio Essentials</div>
+          <div class="icon-row layout horizontal wrap start-justified">
+              <template is="dom-repeat" items="[[essentialsVideos]]">
+                  <wistia-video size="[[getVideoSize(wide)]]" id$="[[item.videoId]]" video-id="[[item.videoId]]"></wistia-video>
+              </template>
+          </div>
+        </div>
+        <div class="video-section">
+          <div class="video-section-title">Acquisio Fundamentals</div>
+          <div class="icon-row layout horizontal wrap start-justified">
+              <template is="dom-repeat" items="[[getFundamentalVideos(allFundamentalsVideos, maxFundamentalsVideos)]]">
+                  <wistia-video size="[[getVideoSize(wide)]]" id$="[[item.videoId]]" video-id="[[item.videoId]]"></wistia-video>
+              </template>
+              <div class="more-button" hidden$="[[!_hasMoreVideos(maxFundamentalsVideos,allFundamentalsVideos)]]"><paper-button on-tap="addMoreFundamentalsVideos">More</paper-button></div>
+          </div>
+        </div>
     </div>
 
   </template>
@@ -58,7 +191,85 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     Polymer({
 
-      is: 'app-videos'
+      is: 'app-videos',
+      properties: {
+        title: {
+          type: String,
+          value: 'Video Library'
+        },
+        sections: {
+          type: Array,
+          value: function() {
+            return [ 
+              {
+                title: 'Acquisio Essentials',
+                key: 'acquisio_essentials',
+                videos: []
+              },
+              {
+                title: 'Acquisio Fundamentals',
+                key: 'fundamentals_videos',
+                videos: []
+              }
+            ];
+          }
+        },
+        servicesApiRoot: {
+          type: String,
+          value: 'https://localhost.acquisio.com/portal'
+        },
+        allFundamentalsVideos: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+        fundamentalsVideos: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+        essentialsVideos: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+        routeData: {
+          type: Object,
+          value: function() {
+            return {};
+          },
+          observer: '_routeDataChanged'
+        },
+        videosLoading: {
+          type: Boolean,
+          value: true
+        },
+        maxFundamentalsVideos: {
+          type: Number,
+          value: 7
+        }
+      },
+      _hasMoreVideos: function(size,videos) {
+        return videos.length >= size;
+      },
+      getVideoSize: function(size) {
+        return size ? "normal" : "small";
+      },
+      _routeDataChanged: function(n,o) {
+        // do something when the routeData has changed
+      },
+      addMoreFundamentalsVideos: function() {
+        this.maxFundamentalsVideos += 8;
+      },
+      getFundamentalVideos: function (v, c) {
+        return v.slice(0, c);
+      },
+      loadedFundamentals: function() {
+        this.fundamentialsVideos = this.allFundamentalsVideos.slice(0, this.maxFundamentalsVideos);
+      }
 
     });
 

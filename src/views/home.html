@@ -149,14 +149,37 @@
           padding-bottom: 10px;
           width: 360px;
       }
-
+            
       .box-title {
           @apply(--paper-font-title);
-          margin-left: 10px;
-          margin-top: 10px;
+          padding-left: 10px;
+          padding-top: 10px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid lightgrey;
           color: #6a737b;
-          background-color: #fff;
+          background-color: lightgrey;
           width: 350px;
+      }
+
+      paper-card.first .box-title {
+        background-color: #8DD3EB;
+        color: #156480;
+      }
+
+      paper-card.second .box-title {
+        background-color: #7AA4CC;
+        /*background-color: #53708B;*/
+        color: #041C33;
+        /*color: #C9E5FF;*/
+      }
+
+      paper-card.third .box-title {
+        background-color: #FEC898;
+        color: #803C01;
+      }
+
+      .box-footer {
+        /*border-top: 1px solid lightgrey;*/
       }
 
       wistia-video-list {
@@ -211,133 +234,161 @@
               on-request="_clearArticle"
               on-response="_onLoadArticle"></iron-ajax>
 
-    <div class="card">
-      <div class="knowledge-panel">
-        <h1>How can we help you today?</h1>
-        <paper-search-input id="knowledgeSearch" value="{{searchValue}}" on-value-changed="_onSearchValueChanged" on-value-cleared="_clearSearchResults">
-          <terminal-text 
-            clear-delay="1000"
-            back-delay="10"
-            blink-speed="250"
-            cursor="│"
-            delay="10"
-            prefix="{{prefixText}}" 
-            text="{{terminalTextItems}}" 
-            value="{{terminalOutput}}"></terminal-text>
-        </paper-search-input>
-        <p class="knowledge-caption">The help center gives you quick access to settings and tools that let you review your data, protect your privacy, and decide how your information can make Acquisio services work better for you.</p>
+    <iron-pages role="main" selected="[[section]]" attr-for-selected="name">
+
+      <div name="home">
+        <!-- 
+          @ Search Box
+        -->
+        <div class="card">
+          <div class="knowledge-panel">
+            <h1>How can we help you today?</h1>
+            <paper-search-input id="knowledgeSearch" scale="{{searchBoxScale}}" value="{{searchValue}}" on-value-changed="_onSearchValueChanged" on-value-cleared="_clearSearchResults">
+              <terminal-text 
+                clear-delay="1000"
+                back-delay="10"
+                blink-speed="250"
+                cursor="│"
+                delay="10"
+                prefix="{{prefixText}}" 
+                text="{{terminalTextItems}}" 
+                value="{{terminalOutput}}"></terminal-text>
+            </paper-search-input>
+            <p class="knowledge-caption">The help center gives you quick access to settings and tools that let you review your data, protect your privacy, and decide how your information can make Acquisio services work better for you.</p>
+          </div>
+        </div>
+
+        <!-- 
+          @ Icon Grid
+        -->
+        <div class="panelcard layout vertical center" hidden$="[[hideIcons]]">
+          <div class="layout horizontal center-justified wrap">
+
+            <!-- Getting Started -->
+            <div class="box col-md-4">
+              <div class="category">
+                  <a href="#/articles/000002271"><i class="icons-home icons-getting-started"></i></a>
+                  <div class="titles-home">
+                      <a href="#/articles/000002271">Getting Started</a>
+                      <p>New to Acquisio? Click here for a quick start.</p>
+                  </div>
+              </div>
+            </div>
+
+            <!-- FAQ -->
+            <div class="box col-md-4">
+              <div class="category">
+                  <a href="#/faqs/"><i class="icons-home icons-faq"></i></a>
+                  <div class="titles-home">
+                      <a href="#/faqs/">FAQ</a>
+                      <p>Browse our Frequently Asked Questions.</p>
+                  </div>
+              </div>
+            </div>
+
+            <!-- Video Library -->
+            <div class="box col-md-4">
+              <div class="category">
+                  <a href="#/videos/"><i class="icons-home icons-video-library"></i></a>
+                  <div class="titles-home">
+                      <a href="#/videos/">Video Library</a>
+                      <p>Browse and watch our many awesome videos from our library.</p>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--
+          @ Search Results
+          -->
+        <div class="panelcard layout vertical center" hidden$="[[hideSearchResults]]">
+          <div class="layout horizontal center-justified wrap">
+
+                <div class="videos-list">
+                    <paper-card class="first">
+                        <div class="layout vertical">
+                            <div class="box-title fit">Videos</div>
+                            <div style="padding: 10px; color: #6a737b;" hidden$="[[!videosLoading]]">Loading...</div>
+                            <wistia-video-list hidden$="[[videosLoading]]" videos='[[videoResults]]' max-items="4"></wistia-video-list>
+                            <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(videoResults,videosLoading)]]">No videos found</div>
+                            <div class="layout horizontal end-justified">
+                              <div class="box-footer" hidden>
+                                <paper-button raised hidden>More</paper-button>
+                              </div>
+                            </div>
+                        </div>
+                    </paper-card>
+                </div>
+
+                <div class="videos-list">
+                    <paper-card class="second">
+                        <div class="layout vertical">
+                            <div class="box-title">Frequently Asked Questions</div>
+                            <div style="padding: 10px; color: #6a737b;" hidden$="[[!faqsLoading]]">Loading...</div>
+                            <div style="padding: 10px;" hidden$="[[isEmpty(faqResult,faqsLoading)]]">
+                                <paper-listbox id="faqListbox" items="[[faqResult]]">
+                                    <template is="dom-repeat" items="[[getItems(faqResult,faqLimit)]]">
+                                        <faq-item question="[[item.Title]]" category="[[item.Category]]" last-modified="[[item.LastModifiedDate]]">
+                                            <marked-element markdown="[[item.Content]]">
+                                            </marked-element>
+                                        </faq-item>
+                                    </template>
+                                </paper-listbox>
+                            </div>
+                            <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(faqResult,faqsLoading)]]">No FAQs found</div>
+                            <div class="layout horizontal end-justified fit-bottom">
+                                <div class="box-footer">
+                                  <paper-button raised on-click="showLessFaqs" hidden$="[[!showLess(defaultFaqLimit,faqLimit)]]">Less</paper-button>
+                                  <paper-button raised on-click="addMoreFaqs" hidden$="[[!showMore(faqResult,faqLimit)]]">More</paper-button>
+                                </div>
+                            </div>
+                        </div>
+                    </paper-card>
+                </div>
+
+                <div class="videos-list">
+                    <paper-card class="third">
+                        <div class="layout vertical">
+                            <div class="box-title">Articles</div>
+                            <div style="padding: 10px; color: #6a737b;" hidden$="[[!articlesLoading]]">Loading...</div>
+                            <div style="padding: 10px;" hidden$="[[isEmpty(articleResult,articlesLoading)]]">
+                                <paper-listbox id="articleListbox" items="[[articleResult]]">
+                                    <template is="dom-repeat" items="[[getItems(articleResult,articleLimit)]]">
+                                        <paper-item alt="[[item.Title]]" role="listitem" on-click="openArticle">
+                                            <iron-icon style="padding-right: 16px;" icon="mdi:file-document-box"></iron-icon>
+                                            <paper-item-body two-line>
+                                                <div style="white-space: normal;">[[item.Title]]</div>
+                                                <div secondary>Last Modified: [[formatHuman(item.LastModifiedDate)]]</div>
+                                            </paper-item-body>
+                                        </paper-item>
+                                    </template>
+                                </paper-listbox>
+                            </div>
+                            <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(articleResult,articlesLoading)]]">No articles found</div>
+                            <div class="layout horizontal end-justified">
+                                <paper-button raised on-click="showLessArticles" hidden$="[[!showLess(defaultArticleLimit,articleLimit)]]">Less</paper-button>
+                                <paper-button raised on-click="addMoreArticles" hidden$="[[!showMore(articleResult,articleLimit)]]">More</paper-button>
+                            </div>
+                        </div>
+                    </paper-card>
+                </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="panelcard layout vertical center">
-      <div class="layout horizontal center-justified wrap">
+      <div name="article">
 
-        <!-- Getting Started -->
-        <div class="box col-md-4">
-          <div class="category">
-              <a href="#/articles/000002271"><i class="icons-home icons-getting-started"></i></a>
-              <div class="titles-home">
-                  <a href="#/articles/000002271">Getting Started</a>
-                  <p>New to Acquisio? Click here for a quick start.</p>
-              </div>
-          </div>
+        <h2>{{sanitizedArticle.Title}}</h2>
+        <marked-element id="dialogMarkdown" markdown="{{sanitizedArticle.Article_Text__c}}">
+            <div class="markdown-html"></div>
+        </marked-element>
+        <div class="buttons">
+          <paper-button raised on-tap="_closeArticle">Close</paper-button>
         </div>
-
-        <!-- FAQ -->
-        <div class="box col-md-4">
-          <div class="category">
-              <a href="#/faqs/"><i class="icons-home icons-faq"></i></a>
-              <div class="titles-home">
-                  <a href="#/faqs/">FAQ</a>
-                  <p>Browse our Frequently Asked Questions.</p>
-              </div>
-          </div>
-        </div>
-
-        <!-- Video Library -->
-        <div class="box col-md-4">
-          <div class="category">
-              <a href="#/videos/"><i class="icons-home icons-video-library"></i></a>
-              <div class="titles-home">
-                  <a href="#/videos/">Video Library</a>
-                  <p>Browse and watch our many awesome videos from our library.</p>
-              </div>
-          </div>
-        </div>
-    </div>
-  </div>
-
-    <div class="panelcard layout vertical center">
-      <div class="layout horizontal center-justified wrap">
-
-            <div class="videos-list">
-                <paper-card class="first">
-                    <div class="layout vertical">
-                        <div class="box-title">Videos</div>
-                        <div style="padding: 10px; color: #6a737b;" hidden$="[[!videosLoading]]">Loading...</div>
-                        <wistia-video-list hidden$="[[videosLoading]]" videos='[[videoResults]]' max-items="4"></wistia-video-list>
-                        <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(videoResults,videosLoading)]]">No videos found</div>
-                        <div class="layout horizontal end-justified">
-                            <paper-button hidden>More</paper-button>
-                        </div>
-                    </div>
-                </paper-card>
-            </div>
-
-            <div class="videos-list">
-                <paper-card class="second">
-                    <div class="layout vertical">
-                        <div class="box-title">Frequently Asked Questions</div>
-                        <div style="padding: 10px; color: #6a737b;" hidden$="[[!faqsLoading]]">Loading...</div>
-                        <div style="padding: 10px;" hidden$="[[isEmpty(faqResult,faqsLoading)]]">
-                            <paper-listbox id="faqListbox" items="[[faqResult]]">
-                                <template is="dom-repeat" items="[[getItems(faqResult,faqLimit)]]">
-                                    <faq-item question="[[item.Title]]" category="[[item.Category]]" last-modified="[[item.LastModifiedDate]]">
-                                        <marked-element markdown="[[item.Content]]">
-                                        </marked-element>
-                                    </faq-item>
-                                </template>
-                            </paper-listbox>
-                        </div>
-                        <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(faqResult,faqsLoading)]]">No FAQs found</div>
-                        <div class="layout horizontal end-justified">
-                            <paper-button on-click="showLessFaqs" hidden$="[[!showLess(defaultFaqLimit,faqLimit)]]">Less</paper-button>
-                            <paper-button on-click="addMoreFaqs" hidden$="[[!showMore(faqResult,faqLimit)]]">More</paper-button>
-                        </div>
-                    </div>
-                </paper-card>
-            </div>
-
-            <div class="videos-list">
-                <paper-card class="third">
-                    <div class="layout vertical">
-                        <div class="box-title">Articles</div>
-                        <div style="padding: 10px; color: #6a737b;" hidden$="[[!articlesLoading]]">Loading...</div>
-                        <div style="padding: 10px;" hidden$="[[isEmpty(articleResult,articlesLoading)]]">
-                            <paper-listbox id="articleListbox" items="[[articleResult]]">
-                                <template is="dom-repeat" items="[[getItems(articleResult,articleLimit)]]">
-                                    <paper-item alt="[[item.Title]]" role="listitem" on-click="openArticle">
-                                        <paper-item-body two-line>
-                                            <div>[[item.Title]]</div>
-                                            <div secondary>Last Modified: [[formatHuman(item.LastModifiedDate)]]</div>
-                                        </paper-item-body>
-                                        <iron-icon icon="mdi:file-document-box"></iron-icon>
-                                    </paper-item>
-                                </template>
-                            </paper-listbox>
-                        </div>
-                        <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(articleResult,articlesLoading)]]">No articles found</div>
-                        <div class="layout horizontal end-justified">
-                            <paper-button on-click="showLessArticles" hidden$="[[!showLess(defaultArticleLimit,articleLimit)]]">Less</paper-button>
-                            <paper-button on-click="addMoreArticles" hidden$="[[!showMore(articleResult,articleLimit)]]">More</paper-button>
-                        </div>
-                    </div>
-                </paper-card>
-            </div>
       </div>
-    </div>
-    
-    <paper-dialog always-on-top class="fullscreen" id="animated" entry-animation="scale-up-animation" exit-animation="fade-out-animation">
+    </iron-pages>
+<!--    <paper-dialog always-on-top class="fullscreen" id="animated" entry-animation="scale-up-animation" exit-animation="fade-out-animation">
         <h2>{{sanitizedArticle.Title}}</h2>
         <paper-dialog-scrollable>
             <marked-element id="dialogMarkdown" markdown="{{sanitizedArticle.Article_Text__c}}">
@@ -347,7 +398,7 @@
         <div class="buttons">
             <paper-button dialog-dismiss>Close</paper-button>
         </div>
-    </paper-dialog>
+    </paper-dialog> -->
 
   </template>
 
@@ -361,13 +412,23 @@
           type: String,
           value: 'https://localhost.acquisio.com'
         },
+        hideIcons: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        hideSearchResults: {
+          type: Boolean,
+          value: true,
+          notify: true
+        },
         articleLimit: { 
           type: Number,
-          value: 6
+          value: 5
         },
         faqLimit: { 
           type: Number,
-          value: 6
+          value: 5
         },
         videoLimit: { 
           type: Number,
@@ -375,11 +436,11 @@
         },
         defaultArticleLimit: { 
           type: Number,
-          value: 6
+          value: 5
         },
         defaultFaqLimit: { 
           type: Number,
-          value: 6
+          value: 5
         },
         defaultVideoLimit: { 
           type: Number,
@@ -401,6 +462,11 @@
           type: String,
           value: ''
         },
+        searchBoxScale: {
+          type: String,
+          value: "50",
+          notify: true
+        },
         terminalTextItems: {
           type: Array,
           value: function() {
@@ -408,8 +474,7 @@
               'Search^250.^150.^150.^1000',
               'Link an MCC^1000',
               'Custom Reporting^1000',
-              'Clone-Sync^1000',
-              'Campaign management^1000',
+              'Acquisio Social^1000',
               'BBM^1000'
             ];
           }
@@ -423,7 +488,25 @@
           type: String,
           value: '',
           notify: true
+        },
+        section: {
+          type: String,
+          value: 'home'
         }
+      },
+      observers: [
+        '_searchResultsChanged(videoResults.*, faqResult.*, articleResult.*)'
+      ],
+      _searchResultsChanged: function(v,f,a) {
+        var total = v.value.length + f.value.length + a.value.length;
+        console.log("Total Search Results: " + total);
+        if (total > 0) {
+          this.hideIcons = true;
+          this.hideSearchResults = false;
+          return;
+        }
+        this.hideIcons = false;
+        this.hideSearchResults = true;
       },
       expandPath: function(html) {
         var patt = /~/igm;
@@ -431,6 +514,7 @@
       },
       _clearSearchResults: function(e) {
         console.log(e);
+        this._clearAllSearchResults();
       },
       _onSearchValueChanged: function(e) {
         console.log(e);
@@ -481,7 +565,7 @@
         sa.Article_Text__c = at;
         this.sanitizedArticle = sa;
         this.$.dialogMarkdown.render();
-        this.$.animated.open();
+        // this.$.animated.open();
       },
       _clearVideos: function() {
         this.set('videoResults', []);
@@ -512,6 +596,7 @@
         console.log(i.model.item);
         this.articleNumber = i.model.item.ArticleNumber;
         this.$.articleService.generateRequest();
+        this.section = 'article';
       },
       _onVideoSearchResult: function(a, b, c) {
           this.videoResults = _.map(this.videoSearchResult, function(vsr) { return { videoId: vsr.VideoId }; });
@@ -525,6 +610,12 @@
       formatHuman: function(d) {
         return moment(d).fromNow();
       },
+      _closeArticle: function() {
+        this.section = 'home';
+      },
+      attach: function() {
+
+      },
       ready: function() {
         var app = this;
         //this.$.animated.positionTarget = document.querySelector('body');
@@ -536,6 +627,11 @@
           app.$.faqListbox.selected = -1;
           app._resetLimits();
         });
+        this.async(function() {
+          if (this.searchBoxScale < 50) {
+            this.searchBoxScale = "100";
+          }
+        }, 1000);
       }
     });
     

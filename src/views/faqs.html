@@ -178,11 +178,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div class="card layout vertical center">
         <div class="page-title">Frequently Asked Questions</div>
         <div class="layout horizontal center-justified wrap">
-
-            <paper-header-panel style="height: 100px;" mode="cover">
-                <div class="paper-header">Header</div>
-                <div>Content goes here...</div>
-            </paper-header-panel>
             <template is="dom-repeat" items="[[faqResult]]" as="faqGroup">
                 <div class$="videos-list [[_elevated(queryMatches)]]">
                     <paper-card class$="faq-group-[[index]]" elevation="[[_getElevation(queryMatches)]]">
