@@ -1,7 +1,7 @@
 {
   "name": "app-drawer-template",
   "authors": [
-    "The Polymer Authors"
+    "Keith Hill <keith@dexs.ca>"
   ],
   "private": true,
   "dependencies": {
@@ -21,9 +21,9 @@
     "polymer": "polymer/polymer#^1.4.0",
     "paper-elements": "PolymerElements/paper-elements#^1.0.5",
     "paper-search-input": "^1.0.7",
-    "cc-form": "^1.0.7",
-    "terminal-text": "^1.0.8",
-    "wistia-video": "^1.0.2",
+    "cc-form": "^1.0.12",
+    "terminal-text": "^1.0.9",
+    "wistia-video": "^1.0.4",
     "faq-item": "vic10us/faq-item#master",
     "paper-listbox": "^1.1.2",
     "marked-element": "^1.2.0",

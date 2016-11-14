@@ -1,0 +1,40 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": "auth != null && auth.admin == true",
+    "categories": {
+      ".write": "auth != null && auth.admin == true"
+    },
+    "kb": {
+      ".write": "auth != null && auth.admin == true",
+      "articles": {
+        ".write": false,
+        "$article_id": {
+          ".write": "auth != null && auth.admin == true",
+          ".indexOn": [
+            "title",
+            "content",
+            "category",
+            "owner"
+          ]
+        }
+      }
+    },
+    "pages": {
+      ".write": "auth != null && auth.admin == true",
+      ".indexOn": "state"
+    },
+    "images": {
+      "$page_id": {
+        ".write": "auth != null && root.child('paginas/'+$page_id).exists() && root.child('paginas/'+$page_id).child('state').val() == 'available'",
+        ".indexOn": [
+          "category",
+          "owner"
+        ]
+      }
+    },
+    "settings": {
+      ".write": "auth != null && auth.admin == true"
+    }
+  }
+}
