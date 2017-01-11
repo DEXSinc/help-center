@@ -1,4 +1,5 @@
 <link rel="import" href="../../lib/polymer/polymer.html">
+<script src="../../lib/particles.js/particles.min.js"></script>
 
 <dom-module id="app-home">
 
@@ -241,6 +242,7 @@
           @ Search Box
         -->
         <div class="card">
+          <div id="particles-js" style="position: absolute;"></div>
           <div class="knowledge-panel">
             <h1>How can we help you today?</h1>
             <paper-search-input id="knowledgeSearch" scale="{{searchBoxScale}}" value="{{searchValue}}" on-value-changed="_onSearchValueChanged" on-value-cleared="_clearSearchResults">
@@ -634,7 +636,12 @@
         }, 1000);
       }
     });
-    
+
+    /* particlesJS.load(@dom-id, @path-json, @callback (optional)); */
+    particlesJS.load('particles-js', 'assets/particles.json', function() {
+      console.log('callback - particles.js config loaded');
+    });
+
   </script>
 
 </dom-module>
