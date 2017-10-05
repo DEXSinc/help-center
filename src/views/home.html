@@ -1,5 +1,4 @@
 <link rel="import" href="../../lib/polymer/polymer.html">
-<script src="../../lib/particles.js/particles.min.js"></script>
 
 <dom-module id="app-home">
 
@@ -11,13 +10,13 @@
         padding: 0;
       }
       .panelcard {
-        @apply(--layout-vertical);
-        @apply(--layout-center);
+        @apply --layout-vertical;
+        @apply --layout-center;
         padding: 20px;
       }
       .card {
-        @apply(--layout-vertical);
-        @apply(--layout-center);
+        @apply --layout-vertical;
+        @apply --layout-center;
         background: url('/images/Motion_1_Duotone.jpg') no-repeat center center;
         -webkit-background-size: cover;
         -moz-background-size: cover;
@@ -36,16 +35,16 @@
       }
       .knowledge-panel {
         color: #fff;
-        @apply(--layout-self-center);
+        @apply --layout-self-center;
         width: 50%;
         min-width: 550px;
       }
       .knowledge-caption {
-        @apply(--paper-font-body2);
+        @apply --paper-font-body2;
         padding: 1em 0;
       }
       h1 {
-        @apply(--paper-font-display2);
+        @apply --paper-font-display2;
         /*text-align: center;*/
         width: 100%;
         /*font-size: 22px;
@@ -98,7 +97,7 @@
         transition: width 0.4s, height 0.4s, background-color 0.4s, transform 0.4s;
       }
       .titles-home a {
-        @apply(--paper-font-headline);
+        @apply --paper-font-headline;
         text-decoration: none;
         color: var(--app-secondary-color);
       }
@@ -152,7 +151,7 @@
       }
             
       .box-title {
-          @apply(--paper-font-title);
+          @apply --paper-font-title;
           padding-left: 10px;
           padding-top: 10px;
           padding-bottom: 10px;
@@ -179,10 +178,6 @@
         color: #803C01;
       }
 
-      .box-footer {
-        /*border-top: 1px solid lightgrey;*/
-      }
-
       wistia-video-list {
           width: 360px;
       }  
@@ -204,7 +199,7 @@
     </style>
 
     <iron-ajax id="videoSearchFeed"
-              url="{{serviceUrl}}/services/api/v1/articles/search"
+              url="{{serviceUrl}}/api/v1/articles/search"
               method="GET"
               params="[[_getParams(searchValue,4)]]"
               last-response="{{videoSearchResult}}"
@@ -212,7 +207,7 @@
               on-request="_clearVideos"
               on-response="_onVideoSearchResult"></iron-ajax>
     <iron-ajax id="articleSearchFeed"
-              url="{{serviceUrl}}/services/api/v1/articles/search"
+              url="{{serviceUrl}}/api/v1/articles/search"
               method="GET"
               params="[[_getParams(searchValue,0)]]"
               last-response="{{articleResult}}"
@@ -220,7 +215,7 @@
               on-request="_clearArticles"
               on-response="_onArticleSearchResult"></iron-ajax>
     <iron-ajax id="faqSearchFeed"
-              url="{{serviceUrl}}/services/api/v1/articles/search"
+              url="{{serviceUrl}}/api/v1/articles/search"
               method="GET"
               params="[[_getParams(searchValue,2)]]"
               last-response="{{faqResult}}"
@@ -228,7 +223,7 @@
               on-request="_clearFaqs"
               on-response="_onFaqSearchResult"></iron-ajax>
     <iron-ajax id="articleService"
-              url="{{serviceUrl}}/services/api/v1/articles/{{articleNumber}}"
+              url="{{serviceUrl}}/api/v1/articles/{{articleNumber}}"
               method="GET"
               last-response="{{currentArticle}}"
               loading="{{articleLoading}}"
@@ -331,8 +326,8 @@
                             <div style="padding: 10px;" hidden$="[[isEmpty(faqResult,faqsLoading)]]">
                                 <paper-listbox id="faqListbox" items="[[faqResult]]">
                                     <template is="dom-repeat" items="[[getItems(faqResult,faqLimit)]]">
-                                        <faq-item question="[[item.Title]]" category="[[item.Category]]" last-modified="[[item.LastModifiedDate]]">
-                                            <marked-element markdown="[[item.Content]]">
+                                        <faq-item question="[[item.title]]" category="[[item.category]]" last-modified="[[item.lastModifiedDate]]">
+                                            <marked-element markdown="[[item.content]]">
                                             </marked-element>
                                         </faq-item>
                                     </template>
@@ -360,8 +355,8 @@
                                         <paper-item alt="[[item.Title]]" role="listitem" on-click="openArticle">
                                             <iron-icon style="padding-right: 16px;" icon="mdi:file-document-box"></iron-icon>
                                             <paper-item-body two-line>
-                                                <div style="white-space: normal;">[[item.Title]]</div>
-                                                <div secondary>Last Modified: [[formatHuman(item.LastModifiedDate)]]</div>
+                                                <div style="white-space: normal;">[[item.title]]</div>
+                                                <div secondary>Last Modified: [[formatHuman(item.lastModifiedDate)]]</div>
                                             </paper-item-body>
                                         </paper-item>
                                     </template>
@@ -382,7 +377,7 @@
       <div name="article">
 
         <h2>{{sanitizedArticle.Title}}</h2>
-        <marked-element id="dialogMarkdown" markdown="{{sanitizedArticle.Article_Text__c}}">
+        <marked-element id="dialogMarkdown" markdown="{{sanitizedArticle.article_Text__c}}">
             <div class="markdown-html"></div>
         </marked-element>
         <div class="buttons">
@@ -563,8 +558,8 @@
       },
       _onLoadArticle: function() {
         var sa = this.currentArticle;
-        var at = this.expandPath(sa.Article_Text__c);
-        sa.Article_Text__c = at;
+        var at = this.expandPath(sa.article_Text__c);
+        sa.article_Text__c = at;
         this.sanitizedArticle = sa;
         this.$.dialogMarkdown.render();
         // this.$.animated.open();
@@ -596,12 +591,12 @@
         this.$.faqListbox.selected = -1;
         if (!!!i || !!!i.model || !!!i.model.item) return;
         console.log(i.model.item);
-        this.articleNumber = i.model.item.ArticleNumber;
+        this.articleNumber = i.model.item.articleNumber;
         this.$.articleService.generateRequest();
         this.section = 'article';
       },
       _onVideoSearchResult: function(a, b, c) {
-          this.videoResults = _.map(this.videoSearchResult, function(vsr) { return { videoId: vsr.VideoId }; });
+          this.videoResults = _.map(this.videoSearchResult, function(vsr) { return { videoId: vsr.videoId }; });
           this.hasVideoResults = this.videoResults.length > 0;
       },
       _resetLimits: function() {
@@ -635,11 +630,6 @@
           }
         }, 1000);
       }
-    });
-
-    /* particlesJS.load(@dom-id, @path-json, @callback (optional)); */
-    particlesJS.load('particles-js', 'assets/particles.json', function() {
-      console.log('callback - particles.js config loaded');
     });
 
   </script>

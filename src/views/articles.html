@@ -93,7 +93,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </app-route>
 
     <iron-ajax id="articleFeed"
-           url="https://localhost.acquisio.com/services/api/v1/articles/{{articleId}}"
+           url="https://localhost.acquisio.com/api/v1/articles/{{articleId}}"
            method="GET"
            auto
            last-response="{{article}}"
@@ -107,7 +107,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
 
     <div class="card layout vertical item" wide-layout$="{{wide}}">
-      <div class="title self-center" hidden$="{{articleLoading}}">{{article.Title}}</div>
+      <div class="title self-center" hidden$="{{articleLoading}}">{{article.title}}</div>
       <div id="articleContent" hidden$="{{articleLoading}}"></div>
     </div>
   </template>
@@ -141,8 +141,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Object,
           value: function() {
             return {
-              Title: '',
-              Article_Text__c: ''
+              title: '',
+              article_Text__c: ''
             };
           }
         },
@@ -161,7 +161,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       observers: [
         '_articleDataIdChanged(articleData.id)',
-        '_articleContentChanged(article.Article_Text__c)'
+        '_articleContentChanged(article.article_Text__c)'
       ],
       _subRouteChanged: function(n,o) {
         //console.log(n);
@@ -181,7 +181,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.articleId = n;
       },
       _onArticleResult: function(a) {
-        console.log(a);
+        //console.log(a);
       }
 
     });

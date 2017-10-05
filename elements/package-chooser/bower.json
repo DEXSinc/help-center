@@ -1,0 +1,38 @@
+{
+  "name": "package-chooser",
+  "author":"Keith Hill",
+  "version": "0.0.0",
+  "description": "nothing yet",
+  "private": true,
+  "license": "https://github.com/vic10us/package-chooser/LICENSE",
+  "homepage": "https://github.com/vic10us/package-chooser",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vic10us/package-chooser.git"
+  },
+  "keywords": [
+    "polymer",
+    "web-components",
+    "web-component"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "demo",
+    "implementation",
+    ".travis.yml",
+    ".github",
+    "wtc.conf.json",
+    "gulpfile.js"
+  ],
+  "dependencies": {
+     "polymer": "Polymer/polymer#^1.7.0"
+  },
+  "devDependencies": {
+     "web-component-tester": "*",
+      "iron-component-page": "PolymerElements/iron-component-page#^1.1.7",
+      "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.2.5"
+  }
+}

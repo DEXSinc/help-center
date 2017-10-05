@@ -30,8 +30,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .title {
-        @apply(--paper-font-display1);
-        @apply(--self-center);
+        @apply --paper-font-display1;
+        @apply --self-center;
         padding-bottom: 40px;
       }
 
@@ -80,15 +80,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         border: 1px solid var(--acquisio-grey-100);
       }
       .video-section-title {
-        @apply(--paper-font-title);
-        @apply(--layout-vertical)
-        @apply(--self-center);
+        @apply --paper-font-title;
+        @apply --layout-vertical;
+        @apply --self-center;
         /*width: 100%;*/
       }
       .more-button paper-button {
         --paper-button: {
-            @apply(--layout-vertical);
-            @apply(--layout-center-center);
+            @apply --layout-vertical;
+            @apply --layout-center-center;
         };
         width: 100%;
         height: 100%;
@@ -139,7 +139,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <iron-ajax id="essentialsVideos"
               method="GET"
-              url="[[servicesApiRoot]]/api/v1/videos/acquisio_essentials"
+              url="[[servicesApiRoot]]/api/v1/videos?category=essentials"
               last-response="{{essentialsVideos}}"
               withCredentials
               handle-as="json"
@@ -149,7 +149,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <iron-ajax id="fundamentialsVideos"
               method="GET"
-              url="[[servicesApiRoot]]/api/v1/videos/fundamentals_videos"
+              url="[[servicesApiRoot]]/api/v1/videos?category=fundamentals"
               last-response="{{allFundamentalsVideos}}"
               withCredentials
               handle-as="json"
@@ -216,7 +216,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         servicesApiRoot: {
           type: String,
-          value: 'https://localhost.acquisio.com/portal'
+          value: 'https://localhost.acquisio.com'
         },
         allFundamentalsVideos: {
           type: Array,

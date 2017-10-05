@@ -1,0 +1,191 @@
+<link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../../lib/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../redux-store.html">
+<link rel="import" href="./dynamo/dynamo-plan-chooser.html">
+<link rel="import" href="./dynamo/dynamo-package-chooser.html">
+<link rel="import" href="./dynamo/dynamo-stepper.html">
+<link rel="import" href="./dynamo/dynamo-complete.html">
+<link rel="import" href="./dynamo/dynamo-product-filter.html">
+<link rel="import" href="./dynamo/dynamo-payment-capture.html">
+
+<dom-module id="app-dynamo-dashboard">
+  <template>
+    <style>
+      :host {
+        display: block;
+        /* font-size: 0.9rem; */
+      }
+      .container {
+        /*font-size: 14px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-gap: 30px;*/
+      }
+      .dashboard {
+        grid-column: 2;
+      }
+      .dashboard > div {
+        display: flex;
+        flex-wrap: wrap;
+        padding-left: 20px;
+        align-items: flex-start;
+      }
+      /*
+      .overview {
+        display: flex;
+        flex-wrap: wrap;
+        padding-left: 20px;
+        align-items: flex-start;
+      } */ 
+      .row {
+        color: var(--app-subtitle-color);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        /* height: 100px; */
+      }
+      .row :not(:first-child) {
+        padding-left: 10px;
+      }
+
+      .heading {
+        width: 100%;
+        padding: 10px 0 10px 0;
+        text-transform: uppercase;
+        font-weight: bold;
+        color: var(--app-title-color, #424242);
+      }
+      .subheading {
+        text-transform: uppercase;
+        color: var(--app-subtitle-color);
+      }
+    </style>
+    <div class="container">
+        <div class="dashboard">
+          <div class="overview">
+            <div class="heading">overview</div>
+            <div class="row">
+              <div class="subheading">stats for</div>
+              <time datetime="[[periodStart]]">[[periodString]]</time>
+              <paper-dropdown-menu no-label-float label="Date Range">
+                  <paper-listbox slot="dropdown-content" class="dropdown-content" selected="1">
+                    <paper-item>This Month</paper-item>
+                    <paper-item>Last Month</paper-item>
+                    <paper-item>This Year</paper-item>
+                    <paper-item>Custom</paper-item>
+                  </paper-listbox>
+                </paper-dropdown-menu>
+            </div>
+          </div>
+          <div class="budget-pacing">
+              <div class="heading">budget pacing for month</div>
+              <div class="row">
+                <img src="/images/sample-bar.png"/>
+                <div>Spend $275</div>
+                <div>Monthly Budget | $500</div>
+                <div class="action" style="color: var(--app-secondary-color);">Adjust Budget</div>
+              </div>
+            </div>
+          </div>
+          <div class="budget-pacing">
+              <div class="heading">Retail</div>
+              <div class="row-grid">
+
+              </div>
+            </div>
+          </div>
+    </div>
+    
+  </template>
+
+  <script>
+    Polymer({
+      is: 'app-dynamo-dashboard',
+      behaviors: [ ReduxBehavior ],
+      properties: {
+        _isReady: {
+          type: Boolean,
+          value: false
+        },
+        queryParameters: {
+          type: Object,
+          value: function() {
+            return {
+              currency: 'EUR'
+            };
+          }
+        },
+        currency: {
+          type: String,
+          computed: 'getCurrency(queryParameters)'
+        },
+        periodStart: {
+          type: Date,
+          value: function() {
+            return new Date();
+          }
+        },
+        periodEnd: {
+          type: Date,
+          value: function() {
+            return new Date();
+          }
+        },
+        periodString: {
+          type: String,
+          computed: 'formatDateRange(periodStart, periodEnd)'
+        }
+      },
+
+      observers: [
+        '_onIsReadyChanged(_isReady)'
+      ],
+
+      listeners: {
+      },
+
+      actions: {
+
+      },
+
+      formatDateRange: function(start, end) {
+        var sm = new moment(start);
+        var em = new moment(end);
+        var sf = 'MMM Do';
+        var ef = 'MMM Do, YYYY';
+        if (sm.year() !== em.year()) sf = ef;
+        return `${sm.format(sf)} - ${em.format(ef)}`;
+      },
+
+      getCurrency: function(q) {
+        if (!!!q) return 'EUR';
+        return q.currency || 'EUR';
+      },
+
+      _onIsReadyChanged: function(isready) {
+        if (isready) {
+          //console.log('Is ready is now TRUE');
+        }
+      },
+
+      created: function() {
+        //console.log(this.localName + '#' + this.id + ' was created');
+      },
+
+      ready: function() {
+        //console.log(this.localName + '#' + this.id + ' has local DOM initialized');
+      },
+
+      attached: function() {
+        //console.log(this.localName + '#' + this.id + ' was attached');
+        this._isReady = true;
+
+      },
+
+      detached: function() {
+        //console.log(this.localName + '#' + this.id + ' was detached');
+      },
+
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,243 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="package-item">
+
+  <template>
+    <style>
+      :host {
+        display: grid;
+      }
+
+      .wrapper {
+        display: grid;
+        padding: 15px;
+        /* height: 265px; */
+        text-align: start;
+        grid-template-columns: 1fr;
+        /* background-color: #fff; */
+        grid-template-rows: auto minmax(60px, auto) 1fr auto;
+      }
+
+      .wrapper.default {
+        transform: scale(1.1);
+        background-color: #fff;
+        border-radius: var(--app-box-border-radius, 10px);
+        box-shadow: 0 1px 8px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.397)), 0 0px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.397)), 0 0 20px 0 hsla(0, 0%, 0%, 0.397) !important;
+      }
+
+      paper-button {
+        transition: all .2s ease-in-out;
+        --paper-button-ink-color: var(--app-primary-color);
+        font-weight: bold;
+        background-color: var(--app-secondary-color);
+        color: white;
+        --paper-button-flat-keyboard-focus: {
+          background-color: var(--app-primary-color) !important;
+          color: white !important;
+        };
+        --paper-button-raised-keyboard-focus: {
+          background-color: var(--app-primary-color) !important;
+          color: white !important;
+        };
+      }
+
+      /* paper-button:hover {
+        background-color: var(--app-primary-color) !important;
+        color: white !important;
+        border-color: var(--app-primary-color);
+      } */
+      
+      .custom paper-button {
+        background-color: white;
+        color: var(--app-secondary-color);
+        border: var(--app-secondary-color) 1px solid;
+      }
+
+      .default paper-button {
+        background-color: var(--app-highlight-color, #39B6B4);
+      }
+
+      .package-title {
+        text-transform: uppercase;
+        font-size: smaller;
+        font-weight: bold;
+        grid-row: 1;
+        color: #424242;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .package-cost {
+        grid-row: 2;
+        height: 100%;
+        text-align: center;
+        color: var(--app-secondary-color, #424242);
+      }
+
+      .default .package-cost {
+        color: var(--app-highlight-color);
+      }
+
+      .sup {
+        vertical-align: super;
+        font-size: 24px;
+        /*font-size: smaller;*/
+      }
+
+      .package-cost .amount {
+        font-size: 48px;
+        font-weight: bold;
+      }
+
+      .package-cost .frequency {
+        font-size: 30px;
+      }
+
+      .package-description {
+        grid-row: 3;
+        font-size: smaller;
+        text-align: center;
+        vertical-align: middle;
+        align-self: center;
+        font-style: oblique;
+        font-weight: bold;
+        color: #626262;
+      }
+
+      .package-action {
+        grid-row: 4;
+        text-align: center;
+      }
+
+      h1 {
+        background-color: red;
+        width: --package-item-width;
+      }
+    </style>
+    
+    <div class$="[[rootClass]] wrapper">
+      <div class="package-title">[[title]]</div>
+      <div class="package-cost">&nbsp;
+        <template is="dom-if" if="[[cost]]">
+          <span class="sup">$</span><span class="amount">[[cost]]</span><span class="frequency">/[[frequency]]</span>
+        </template>
+      </div>
+      <div class="package-description">[[description]]</div>
+      <div class="package-action">
+        <template is="dom-if" if="[[cost]]">
+          <paper-button on-tap="selectItem">Choose Plan</paper-button>
+        </template>
+        <template is="dom-if" if="[[!cost]]">
+          <paper-button on-tap="selectItem">Customize</paper-button>
+        </template>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'package-item',
+
+      properties: {
+        packageId: {
+          type: Number,
+          value: 0
+        },
+        title: {
+          type: String,
+          value: ''
+        },
+        description: {
+          type: String,
+          value: ''
+        },
+        cost: {
+          type: Number,
+          value: 0
+        },
+        frequency: {
+          type: String,
+          value: 'mo'
+        },
+        selected: {
+          type: Boolean,
+          value: false
+        },
+        default: {
+          type: Boolean,
+          value: false
+        },
+        rootClass: {
+          type: String,
+          computed: 'getRootClass(default, cost)'
+        }
+
+      },
+
+      selectItem: function() {
+        this.fire('package-item-selected', { id: this.packageId });
+      },
+
+      getRootClass: function(d, c) {
+        var result = (c === 0) ? 'custom' : '';
+        return d ? 'default ' + result : result;
+      },
+      /**
+       * Called when the element has been created, but before property values
+       * are set and local DOM is initialized. Use for one-time set-up
+       * before property values are set.
+      **/
+      created: function() {
+
+      },
+
+      /**
+       * Called after property values are set and local DOM
+       * is initialized. Use for one-time configuration of your
+       * component after local DOM is initialized.
+      **/
+      ready: function() {
+
+      },
+
+      /**
+       * Life cycle function that gets called when the element is
+       * first attached to the DOM
+      **/
+      attached: function () {
+
+      },
+
+      /**
+       * Called after the element is detached from the document.
+       * Can be called multiple times during the lifetime of an element.
+       * Uses include removing event listeners added in
+      **/
+      detached: function () {
+
+      },
+
+
+      /**
+       * Called when one of the element's attributes is changed.
+       * Use to handle attribute changes that don't correspond
+       * to declared properties.
+      **/
+      attributeChanged: function () {
+
+      },
+
+      /**
+       * ### Events
+      **/
+
+      /**
+       * Fired when package-chooser does something
+       *
+       * @event package-item-selected
+      **/
+
+    });
+  </script>
+</dom-module>

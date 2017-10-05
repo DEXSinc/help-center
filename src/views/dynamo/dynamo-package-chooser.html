@@ -1,0 +1,204 @@
+<link rel="import" href="../../../lib/polymer/polymer.html">
+<link rel="import" href="../../../lib/iron-icons/iron-icons.html">
+<link rel="import" href="../../../lib/iron-icons/maps-icons.html">
+<link rel="import" href="../../../lib/neon-animation/neon-animatable-behavior.html">
+<link rel="import" href="../../../lib/neon-animation/animations/slide-from-left-animation.html">
+<link rel="import" href="../../../lib/neon-animation/animations/fade-out-animation.html">
+
+<dom-module id="dynamo-package-chooser">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .page-grid {
+                text-align: center;
+                display: grid;
+                grid-template-columns: 1fr auto 1fr;
+                align-self: center;
+            }
+            .store-selector {
+                grid-column: 2;
+                display: grid;
+                grid-template-columns: repeat(3, minmax(250px, 300px));
+                grid-auto-rows: minmax(20px, auto);
+                grid-gap: 10px;
+                font-size: 23pt;
+            }
+            paper-ripple {
+                color: var(--app-secondary-color);
+            }
+            .store-selector .box {
+                animation-duration: 1s;
+                padding: 30px;
+                position: relative;
+                background-color: #fff;
+                /* box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.4); */
+                border: #a0a0a0 solid 1px;
+                border: var(--app-subtitle-color,#a0a0ff) solid 1px;
+                border-radius: var(--app-box-border-radius, 10px);
+                cursor: pointer;
+                box-shadow: var(--app-box-shadow-1);
+                transition: box-shadow 0.5s, width 2s, height 2s, background-color 2s, transform 2s;
+                /*background: linear-gradient(171deg, transparent 65%, #F3F4F5 65%, transparent 89%);*/
+            }
+            .store-selector .box:hover {
+                box-shadow: var(--app-box-shadow-0);
+                /* box-shadow: 0 1px 8px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.1)), 0 0px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.1)), 0 0 20px 0 hsla(0, 0%, 0%, 0.1) !important; */
+                /* background: linear-gradient(171deg, transparent 65vh, #F3F4F5 65vh, transparent 89vh); */
+            }
+            .online {
+                /*grid-row: 2;*/
+                /*grid-column: 2;*/ 
+            }
+            .retail {
+                /*grid-row: 2;*/
+                /*grid-column: 3;*/
+            }
+            .both {
+                /*grid-row: 2;*/
+                /*grid-column: 4;*/
+            }
+            .big-icon {
+                --iron-icon-height: 64px;
+                --iron-icon-width: 64px;
+                color: var(--app-secondary-color);
+            }
+            .title {
+                padding-top: 50px;
+                padding-bottom: 20px;
+                grid-row: 1;
+                grid-column: 1 / -1;
+            }
+            .title2 {
+                color: var(--app-title-color);
+            }
+            .subtitle {
+                font-size: 12pt;
+                color: var(--app-subtitle-color);
+            }
+            @media only screen and (max-width: 800px) {
+                .page-grid {
+                    grid-template-columns: 1fr;
+                }
+                .store-selector {
+                    grid-column: 1;
+                    grid-template-columns: repeat(1, minmax(250px, auto));
+                }
+            }
+            /* icons:store */
+            /* icons:shopping-basket */
+        </style>
+        <div class="page-grid">
+        <div class="store-selector">
+            <div class="title">What are your advertising objectives?</div>
+            <div class="online box" on-tap="gotoOnline">
+                <paper-ripple></paper-ripple>
+                <iron-icon class="big-icon" icon="icons:shopping-cart"></iron-icon>
+                <div class="title2">eCommerce</div>
+                <div class="subtitle">Bring more qualified buyers to your eCommerce store</div>
+            </div>
+            <div class="retail box" on-tap="gotoRetail">
+                <paper-ripple></paper-ripple>
+                <iron-icon class="big-icon" icon="icons:store"></iron-icon>
+                <div class="title2">Retail</div>
+                <div class="subtitle">Drive more consumer foot traffic to your store</div>
+            </div>
+            <div class="both box" on-tap="gotoBoth">
+                <paper-ripple></paper-ripple>
+                <iron-icon class="big-icon" icon="icons:shopping-cart"></iron-icon>&nbsp;+
+                <iron-icon class="big-icon" icon="icons:store"></iron-icon>
+                <div class="title2">Both</div>
+                <div class="subtitle">Best option to maximize your product visibility</div>
+            </div>
+        </div>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'dynamo-package-chooser',
+            behaviors: [Polymer.NeonAnimatableBehavior, ReduxBehavior ],
+            properties: {
+                animationConfig: {
+                    value: function() {
+                        return {
+                            'entry': {
+                                name: 'slide-from-left-animation',
+                                node: this
+                            },
+                            'exit': {
+                                name: 'fade-out-animation',
+                                node: this
+                            }
+                        }
+                    }
+                },
+                selected: {
+                    type: String,
+                    notify: true,
+                    reflectToAttribute: true,
+                    value: function() {
+                        return '';
+                    },
+                    observer: '_selectedChanged'
+                },
+                _isReady: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+
+            observers: [ ],
+            
+            _selectedChanged: function(newValue, oldValue) {
+                // console.log(`Selected changed from ${oldValue} to ${newValue}`);
+            },
+
+            gotoOnline: function() {
+                this.selected = 'online';
+                this.notifyPath('selected');
+                this.fire('dynamo-package-chooser-selected', {selected: this.selected});
+            },
+
+            gotoRetail: function() {
+                this.selected = 'retail';
+                this.notifyPath('selected');
+                this.fire('dynamo-package-chooser-selected', {selected: this.selected});
+            },
+
+            gotoBoth: function() {
+                this.selected = 'both';
+                this.notifyPath('selected');
+                this.fire('dynamo-package-chooser-selected', {selected: this.selected});
+            },
+
+            observers: [
+                '_onIsReadyChanged(_isReady)'
+            ],
+
+            _onIsReadyChanged: function (isready) {
+                if (isready) {
+                    // console.log('Is ready is now TRUE');
+                }
+            },
+
+            created: function () {
+                //console.log(this.localName + '#' + this.id + ' was created');
+            },
+
+            ready: function () {
+                //console.log(this.localName + '#' + this.id + ' has local DOM initialized');
+            },
+
+            attached: function () {
+                //console.log(this.localName + '#' + this.id + ' was attached');
+                this._isReady = true;
+            },
+
+            detached: function () {
+                //console.log(this.localName + '#' + this.id + ' was detached');
+            }
+        });
+    </script>
+</dom-module>

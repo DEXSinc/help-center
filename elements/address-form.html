@@ -1,0 +1,159 @@
+﻿<link rel="import" href="../lib/polymer/polymer.html">
+
+<dom-module id="address-form">
+
+    <template>
+
+        <style>
+            .grid1 {
+                display: grid;
+                grid-template-columns: 3fr 2fr;
+                grid-gap: 10px;
+            }
+        </style>
+
+        <iron-ajax id="addressSearchFeed"
+                   on-response="_onAddressSearchResponse"
+                   on-error="_onAddressSearchError"
+                   url="{{addressSearchUrl}}"
+                   with-credentials
+                   handle-as="json"
+                   last-response="{{_addresses}}">
+        </iron-ajax>
+
+        <div class="layout vertical flex">
+                
+            <paper-input name="street" label="Address" required value="{{street}}"></paper-input>
+
+            <paper-input name="city" label="City" value="{{city}}" required></paper-input>
+
+            <div class="grid1">
+                <paper-input name="state" label="State/Province" value="{{state}}" required></paper-input>
+                <paper-input name="zip" label="Zip/Postal Code" required auto-validate value="{{zip}}"></paper-input>
+            </div>
+
+            <paper-input name="country" label="Country" value="{{country}}" required></paper-input>
+            
+        </div>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'address-form',
+            properties: {
+                street: {
+                    type: String,
+                    value: '',
+                    notify: true
+                },
+                city: {
+                    type: String,
+                    value: '',
+                    notify: true
+                },
+                state: {
+                    type: String,
+                    value: '',
+                    notify: true
+                },
+                country: {
+                    type: String,
+                    value: '',
+                    notify: true
+                },
+                zip: {
+                    type: String,
+                    value: '',
+                    notify: true
+                },
+                addressSearchUrl: {
+                    type: String,
+                    value: '/address/find',
+                    notify: true
+                },
+                verbose: {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                _initialProvincesLoaded: {
+                    type: Boolean,
+                    readonly: true,
+                    notify: false,
+                    value: false
+                },
+                _addresses: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                }
+            },
+            _log: function (msg) {
+                if (this.verbose)
+                    console.log(msg);
+            },
+            observers: [
+                '_addressResponse(_addresses)',
+                '_addressChanged(zip, street)',
+                '_zipChanged(zip)',
+                '_streetChanged(street)'
+            ],
+            _zipChanged: function (zip) {
+                this._log(zip);
+                var request = zip;
+
+                if (request.length > 2) {
+                    this.$.addressSearchFeed.params = {
+                        address: request
+                    };
+                    this.$.addressSearchFeed.generateRequest();
+                }
+            },
+            _streetChanged: function (street) {
+
+            },
+            _addressChanged: function (zip, street) {
+                this._log([zip, street]);
+                /*
+                var request = `${street} ${zip}`;
+
+                if (request.length > 2) {
+                    this.$.addressSearchFeed.params = {
+                        address: request
+                    };
+                    this.$.addressSearchFeed.generateRequest();
+                }
+                */
+            },
+            _addressResponse: function(resp) {
+                if (!resp || !resp.length) return;
+                this._log(['Address Search Response Received', resp]);
+                if (resp.length === 1) {
+                    this._initialProvincesLoaded = false;
+                    this.country = resp.country.longName;
+                    this.state = resp.province.longName;
+                    this.city = resp.locality.longName;
+                }
+            },
+            _onAddressSearchResponse: function (e) {
+                var resp = e.detail.response;
+            },
+            _onAddressSearchError: function (e) {
+                this._log(['Address Search Failed', e]);
+            },
+            ready: function () {
+                this._log('address-form ready');
+            },
+            attached: function () {
+                this._log('address-form attached');
+            },
+            detached: function () {
+                this._log('address-form detached');
+            }
+        });
+    </script>
+
+</dom-module>

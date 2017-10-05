@@ -1,0 +1,200 @@
+<link rel="import" href="../lib/polymer/polymer.html">
+<link rel="import" href="../lib/polymer-redux/polymer-redux.html" >
+
+<script>
+    const initialState = {
+        friends: [],
+        stripePublishableKey: 'pk_test_4yXPdlu4RWjHnY5U6xobOc6x',
+        loading: false,
+        username: null,
+        routeData: {},
+        page: {
+            name: 'home',
+            title: 'Home'
+        },
+        pageTitles: {
+            'home': 'Home',
+            'dynamo': 'Google Shopping Launcher',
+            'dynamo-dashboard': 'Dashboard',
+            'faqs': 'Frequently Asked Questions',
+            'videos': 'Video Library',
+            'articles': 'Knowledge Articles'
+        },
+        selectedPackage: null,
+        selectedPackageDetails: {},
+        selectedPlan: null,
+        selectedPackagePlans: [],
+        selectedPackagePlanCount: 0,
+        dynamoPackages: [
+            {
+                id: 'online',
+                name: 'eCommerce',
+                icons: ['icons:shopping-cart'],
+                description: 'Bring more qualified buyers to your eCommerce store',
+                defaultPlan: 2
+            },{
+                id: 'retail',
+                name: 'Retail',
+                icons: ['icons:store'],
+                description: 'Drive more consumer foot traffic to your store',
+                defaultPlan: 2
+            },{
+                id: 'both',
+                name: 'Both',
+                icons: ['icons:shopping-cart','icons:store'],
+                description: 'Best option to maximize your product visibility',
+                defaultPlan: 1
+            }
+        ],
+        dynamoPlans: [
+            {
+                id: 'online',
+                plans: [{
+                        id: 1,
+                        name: 'Starter',
+                        cost: 199,
+                        frequency: 'mo',
+                        description: 'All the basics for a small store that is new to online advertising'
+                    }, {
+                        id: 2,
+                        name: 'Standard',
+                        cost: 499,
+                        frequency: 'mo',
+                        description: 'Everything you need to stay competitive and relevant on Google Search'
+                    }, {
+                        id: 3,
+                        name: 'Advanced',
+                        cost: 899,
+                        frequency: 'mo',
+                        description: 'Advanced machine learning and optimization to help you scale'
+                    }, {
+                        id: 4,
+                        name: 'Custom',
+                        cost: 0,
+                        frequency: null,
+                        description: 'Adjust the spend as per your needs and the machine learning technology will maximize performance'
+                    }
+                ]
+            }, {
+                id: 'retail',
+                plans: [{
+                        id: 1,
+                        name: 'Starter',
+                        cost: 199,
+                        frequency: 'mo',
+                        description: 'All the basics for a small store that is new to online advertising'
+                    }, {
+                        id: 2,
+                        name: 'Standard',
+                        cost: 499,
+                        frequency: 'mo',
+                        description: 'Everything you need to stay competitive and relevant on Google Search'
+                    }, {
+                        id: 3,
+                        name: 'Advanced',
+                        cost: 899,
+                        frequency: 'mo',
+                        description: 'Advanced machine learning and optimization to help you scale'
+                    }, {
+                        id: 4,
+                        name: 'Custom',
+                        cost: 0,
+                        frequency: null,
+                        description: 'Adjust the spend as per your needs and the machine learning technology will maximize performance'
+                    }
+                ]
+            }, {
+                id: 'both',
+                plans: [
+                    {
+                        id: 1,
+                        name: 'Standard',
+                        cost: 699,
+                        frequency: 'mo',
+                        description: 'Everything you need to stay competitive and relevant on Google Search'
+                    }, {
+                        id: 2,
+                        name: 'Advanced',
+                        cost: 1099,
+                        frequency: 'mo',
+                        description: 'Advanced machine learning and optimization to help you scale'
+                    }, {
+                        id: 3,
+                        name: 'Custom',
+                        cost: 0,
+                        frequency: null,
+                        description: 'Adjust the spend as per your needs and the machine learning technology will maximize performance'
+                    }
+                ]
+            }
+        ]
+    };
+
+    const reducer = (state, action) => {
+        if (!state) return initialState;
+        switch (action.type) {
+            case 'PACKAGE_SELECTED': {
+                let selectedPackagePlans = state.dynamoPlans.find(function(ee) {
+                    return ee.id == action.id;
+                }).plans || [];
+                let selectedPackageDetails = state.dynamoPackages.find(function(ee) {
+                    return ee.id == action.id;
+                }) || null;
+                return Object.assign({}, state, { selectedPackagePlanCount: selectedPackagePlans.length, selectedPackage: action.id, selectedPackagePlans: selectedPackagePlans, selectedPackageDetails: selectedPackageDetails });
+            }
+            case 'PLAN_SELECTED': {
+                let selectedPlan = state.selectedPackagePlans.find(function(ee) {
+                    return ee.id == action.id;
+                }) || null;
+                return Object.assign({}, state, { selectedPlan: selectedPlan });
+            }
+            case 'ADD_FRIEND':  {
+                const friends = state.friends.slice(0);
+                friends.push(action.friend);
+                return Object.assign({}, state, { friends: friends });
+            }
+            case 'SIGN_UP_STARTED': {
+                return Object.assign({}, state, { loading: true });
+            }
+            case 'SIGN_UP_COMPLETED': {
+                return Object.assign({}, state, { loading: false, username: action.username });
+            }
+            case 'ROUTE_CHANGED': {
+                var pageTitle = state.pageTitles[action.data.page] || state.pageTitles['home'];
+                return Object.assign({}, state, { routeData: action.data, page: { title: pageTitle, name: action.data.page } });
+            }
+            default: 
+                return state;
+        }
+    };
+
+    const store = Redux.createStore(
+        reducer,
+        Redux.applyMiddleware(ReduxThunk.default)
+    );
+
+    /**
+     * Behavior that highlights stuff.
+     *
+     * @polymerBehavior
+     */
+    const ReduxBehavior = PolymerRedux(store);
+
+    /**
+     * Behavior that highlights stuff.
+     *
+     * @polymerBehavior
+     */
+    const AsyncActionsBehavior = {
+        actions: {
+            signUpWithTimeout: function(username) {
+                return function(dispatch) {
+                    dispatch({type: 'SIGN_UP_STARTED'});
+                    setTimeout(function() {
+                        dispatch({ type: 'SIGN_UP_COMPLETED', username: username });
+                    }, 3000);
+                }
+            }
+        }
+    };
+</script>

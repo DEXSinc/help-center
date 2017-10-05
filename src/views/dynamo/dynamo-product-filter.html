@@ -1,0 +1,387 @@
+<link rel="import" href="../../../lib/polymer/polymer.html">
+<link rel="import" href="../../../lib/neon-animation/neon-animatable-behavior.html">
+<link rel="import" href="../../../lib/neon-animation/animations/slide-from-right-animation.html">
+<link rel="import" href="../../../lib/neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../../../lib/paper-toggle-button/paper-toggle-button.html">
+<link rel="stylesheets" href="stripe.css">
+<!-- <script src="//js.stripe.com/v3/"></script> -->
+
+<dom-module id="dynamo-product-filter">
+  <template>
+    <style>
+      
+      :host {
+        display: block;
+        padding: 10px 20px;
+      }
+      .card-container {
+        padding-top: 30px;
+        display: grid;
+        grid-template-columns: 1fr minmax(350px, 500px) 1fr;
+      }
+      .card {
+        padding: 30px;
+        background-color: #fff;
+        border-radius: var(--app-box-border-radius, 10px);
+        box-shadow: var(--app-box-shadow-0) !important; /*0 1px 8px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.397)), 0 0px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.397)), 0 0 20px 0 hsla(0, 0%, 0%, 0.397) !important;*/
+        grid-column: 2;
+        /* height: 300px; */
+        display: grid;
+        grid-auto-flow: dense;
+        grid-template-columns: 1fr;
+      }
+      paper-range-slider {
+        width: 100%;
+      }
+      .title {
+        padding: 10px;
+        text-align: center;
+        text-transform: uppercase;
+        font-weight: bold;
+        color: var(--app-title-color, #424242);
+      }
+      .subtitle {
+        padding: 10px;
+        text-align: center;
+        color: var(--app-subtitle-color, #626262);
+      }
+
+      .slider-group {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .label {
+          font-weight: bold;
+      }
+
+      .slider-group .label {
+        grid-row: 1;
+        grid-column: 1 / -1;
+        padding-bottom: 30px;
+        color: #474747;
+      }
+
+      .slider-group .label:not(.first) {
+        padding-top: 36px;
+      }
+
+      .slider-group .label .first {
+        padding-top: 10px;
+      }
+
+      .start {
+        text-align: left;
+        padding-left: 15px;
+        grid-row: 3;
+      }
+      .end {
+        text-align: right;
+        padding-right: 15px;
+        grid-row: 3;
+      }
+
+      .slider-group paper-slider,
+      .slider-group paper-range-slider {
+        grid-row: 2;
+        grid-column: 1 / -1;
+        width: 100%;
+      }
+    </style>
+    
+    <div class="title">Filter products you want advertised</div>
+    <div class="subtitle">Use the sliders to define the lower and upper price range for the products that will be advertised</div>
+
+    <div class="card-container">
+      <div class="card">
+        <paper-toggle-button>Advertise all my products</paper-toggle-button>
+        <div class="slider-group">
+            <div class="label">Products advertised<div class="subtitle">[[onlineFilterLabel]]</div></div>
+            <paper-range-slider markers="[0,199,399]" slider-width="99%" class="slider" pin step="25" value-diff-min="5" value-min="{{onlineFilterMin}}" value-max="{{onlineFilterMax}}" max="2500" min="0"></paper-range-slider>
+            <div class="start bubble">$0</div>
+            <div class="end bubble">No Limit</div>
+        </div>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'dynamo-product-filter',
+      behaviors: [Polymer.NeonAnimatableBehavior],
+      properties: {
+        animationConfig: {
+          value: function() {
+            return {
+              'entry': {
+                name: 'slide-from-right-animation',
+                node: this
+              },
+              'exit': {
+                name: 'fade-out-animation',
+                node: this
+              }
+            }
+          }
+        },
+        selected: {
+          type: Number,
+          value: 0
+        },
+        completedSteps: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+        onlineFilterMin: {
+          type: Number,
+          value: 50
+        },
+        onlineFilterMax: {
+          type: Number,
+          value: 2000
+        },
+        retailFilterMin: {
+          type: Number,
+          value: 50
+        },
+        retailFilterMax: {
+          type: Number,
+          value: 4000
+        },
+        minimumOnlineBudget: {
+          type: Number,
+          value: 199
+        },
+        maximumOnlineBudget: {
+          type: Number,
+          value: 1499
+        },
+        minimumRetailBudget: {
+          type: Number,
+          value: 199
+        },
+        maximumRetailBudget: {
+          type: Number,
+          value: 1499
+        },
+        monthlyRetailBudget: {
+          type: Number,
+          value: 500
+        },
+        monthlyOnlineBudget: {
+          type: Number,
+          value: 500
+        },
+        promotion: {
+          type: Number,
+          value: 50
+        },
+        totalBudgetLabel: {
+          type: String,
+          computed: 'getTotalBudgetLabel(monthlyOnlineBudget, monthlyRetailBudget)'
+        },
+        onlineBudgetLabel: {
+          type: String,
+          computed: 'formatMoney(monthlyOnlineBudget)'
+        },
+        retailBudgetLabel: {
+          type: String,
+          computed: 'formatMoney(monthlyRetailBudget)'
+        },
+        promotionLabel: {
+          type: String,
+          computed: 'formatMoney(promotion)'
+        },
+        monthlyBudgetWithPromotLabel: {
+          type: String,
+          computed: 'formatMoney(totalBudgetWithPromotion)'
+        },
+        onlineFilterLabel: {
+          type: String,
+          computed: 'getFilteredProductsLabel(onlineFilterMin, onlineFilterMax)'
+        },
+        retailFilterLabel: {
+          type: String,
+          computed: 'getFilteredProductsLabel(retailFilterMin, retailFilterMax)'
+        },
+        monthlyBudget: {
+          type: Number,
+          computed: 'getMonthlyBudget(monthlyOnlineBudget, monthlyRetailBudget)'
+        },
+        totalBudgetWithPromotion: {
+            type: Number,
+            computed: 'getMonthlyBudgetWithPromo(monthlyOnlineBudget, monthlyRetailBudget, promotion)'
+        },
+        monthlyBudgetLabel: {
+          type: String,
+          computed: 'getMonthlyBudgetLabel(monthlyRetailBudget, monthlyOnlineBudget, monthlyBudget)'
+        },
+        _isReady: {
+          type: Boolean,
+          value: false
+        },
+        currentStep: {
+            type: Number
+        },
+        selectedOption: {
+            type: String,
+            value: function() {
+                return '';
+            }
+        },
+        isRetail: {
+            type: Boolean,
+            computed: '_computeIsRetail(selectedOption)'
+        },
+        isOnline: {
+            type: Boolean,
+            computed: '_computeIsOnline(selectedOption)'
+        },
+        showInfo: {
+            type: Boolean,
+            computed: '_isInfoReady(currentStep)'
+        },
+        complete: {
+            type: Boolean,
+            value: false
+        }
+      },
+
+      observers: [
+        '_onIsReadyChanged(_isReady)'
+      ],
+
+      listeners: {
+          'paper-stepper-completed': 'stepperCompleted'
+      },
+
+      goBack: function() {
+          this.$.stepper.reset();
+          this.fire('dynamo-stepper-reset', {});
+      },
+
+      stepperCompleted: function() {
+        //console.log('Process completed!');
+        this.completedSteps = [
+          {
+            description: 'Payment Processed'
+          },
+          {
+            description: 'AdWords Account Created'
+          },
+          {
+            description: 'Merchant Center Account Created'
+          },
+          {
+            description: 'Product Feed Transformed and Uploaded'
+          },
+          {
+            description: 'AdWords Campaigns Created'
+          },
+          {
+            description: 'Optimization Enabled'
+          }
+        ];
+        this.notifyPath('completedSteps');
+      },
+
+      _isInfoReady: function(step) {
+          //console.log(`on step: ${step}`);
+          return step >= 0;
+      },
+
+      _computeIsRetail: function(option) {
+          return option === 'retail' || option === 'both';
+      },
+
+      _computeIsOnline: function(option) {
+          return option === 'online' || option === 'both';
+      },
+
+      onTapItem1: function() {
+        this.fire('request-change-page', {
+          path: 'detail/1',
+          animation: 'forward'
+        });
+      },
+
+      startStepper: function() {
+        this.$.stepper.progress();
+      },
+
+      toggleVerical: function() {
+        this.$.stepper.vertical = !this.$.stepper.vertical;
+      },
+
+      _onIsReadyChanged: function(isready) {
+        if (isready) {
+          //console.log('Is ready is now TRUE');
+          //var stepper = this.$.stepper;
+          /*this.async(function() {
+            console.log(stepper);
+            stepper.progress();
+          });*/
+        }
+      },
+
+      getTotalBudgetLabel: function(online, retail) {
+        return this.formatMoney(online + retail);
+      },
+
+      getFilteredProductsLabel: function(min, max) {
+        var a = this.formatMoney(min);
+        var b = max >= 4000 ? "No Limit" : this.formatMoney(max);
+        if (min <= 0 && max < 4000) {
+          return `all products below ${b}`;
+        }
+        if (min > 0 && max >= 4000) {
+          return `all product above ${a}`;
+        }
+        if (min <= 0 && max >= 4000) {
+          return 'all products';
+        }
+        return `products between ${a} and ${b}`;
+      },
+
+      getMonthlyBudget: function(Retail, Online) {
+        return Retail + Online;
+      },
+      getMonthlyBudgetWithPromo: function(monthlyOnlineBudget, monthlyRetailBudget, promotion) {
+          return monthlyOnlineBudget + monthlyRetailBudget - promotion;
+      },
+      getMonthlyBudgetLabel: function(Retail, Online, total) {
+        return `Set Budget ${this.formatMoney(Online)} (eCommerce) ${this.formatMoney(Retail)} (Local) : Total ${this.formatMoney(total)}`;
+        if (val > 0) {
+          return `Monthly Budget : ${this.monthlyBudgetStr}`;
+        } else {
+          return `Set Monthly Budget`;
+        }
+      },
+
+      formatMoney: function(val) {
+        return formatter.format(val);
+      },
+
+      created: function() {
+        //console.log(this.localName + '#' + this.id + ' was created');
+      },
+
+      ready: function() {
+        //console.log(this.localName + '#' + this.id + ' has local DOM initialized');
+      },
+
+      attached: function() {
+        //console.log(this.localName + '#' + this.id + ' was attached');
+        this._isReady = true;
+      },
+
+      detached: function() {
+        //console.log(this.localName + '#' + this.id + ' was detached');
+      },
+
+    });
+  </script>
+</dom-module>

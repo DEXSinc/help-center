@@ -1,0 +1,49 @@
+<dom-module id="package-chooser-styles">
+  <template>
+    <style>
+    :host {
+        display: block;
+        box-sizing: border-box;
+    }
+
+    .title {
+      padding: 10px;
+      text-align: center;
+      text-transform: uppercase;
+      font-weight: bold;
+      color: #424242;
+    }
+
+    .subtitle {
+      padding: 10px;
+      text-align: center;
+      color: #626262;
+    }
+    
+    .package-list {
+      padding-top: 30px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+    }
+
+    .package-items {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 8px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.397)), 0 0px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.397)), 0 0 20px 0 hsla(0, 0%, 0%, 0.397) !important;
+      grid-column: 2;
+      height: 300px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 275px));
+    }
+
+    .package-items package-item:not(:first-child) {
+      border-left: var(--shadow-color, hsla(0, 0%, 0%, 0.397)) solid 1px;
+    }
+
+    h1 {
+      background-color: red;
+      width: --package-chooser-width;
+    }
+    </style>
+  </template>
+</dom-module>
