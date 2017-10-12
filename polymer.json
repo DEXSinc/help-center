@@ -5,6 +5,10 @@
     "src/views/home.html",
     "src/views/articles.html",
     "src/views/faqs.html",
+    "src/views/dynamo.html",
+    "src/views/dynamo-dashboard.html",
+    "src/views/vide1.html",
+    "src/views/view404.html",
     "src/views/videos.html"
   ]
 }
