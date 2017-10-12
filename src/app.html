@@ -21,6 +21,7 @@
         --paper-slider-knob-color: var(--app-primary-color);
         --paper-slider-pin-color: var(--app-primary-color);
         --app-page-logo: url('/images/acquisio-logo.svg');
+        --app-page-icon: url('/images/icons/app-icon.svg');
         --app-box-shadow-color: var(--shadow-color, hsla(0, 0%, 0%, 0.397));
         --app-box-shadow-color-2: var(--shadow-color-2, hsla(0, 0%, 0%, 0.116));
         --app-box-border-radius: 5px;
@@ -80,6 +81,16 @@
       .logo img {
         content: var(--app-page-logo);
       }
+      span.page-icon > img {
+        content: var(--app-page-icon);
+        width: 100%;
+      }
+      .page-icon img {
+        width: 32px;
+        padding: 2px;
+        display: block;
+        content: var(--app-page-icon);
+      }
       .toolbar-icons {
         @apply --layout-horizontal;
       }
@@ -121,7 +132,7 @@
         <app-header fixed condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
-            <a class="logo" href="#/" style="padding-right: 15px;"><img class="logo" a-src="/images/acquisio-logo.svg"/></a>
+            <a class="page-icon" href="#/" style="padding: 10px;"><img class="page-icon" a-src="/images/logo/app-icon.svg"/></a>
             <div class="flexchild" title><b>Dynamo</b> | <span>[[pageTitle]]</span></div>
             <div class="toolbar-icons">
               <a name="home" href="#/"><paper-icon-button icon="home"></paper-icon-button></a>
@@ -154,7 +165,6 @@
       is: 'my-app',
       behaviors: [ReduxBehavior],
       properties: {
-
         page: {
           type: String,
           reflectToAttribute: true,

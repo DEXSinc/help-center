@@ -10,12 +10,10 @@
 
       :host {
         display: block;
-        /* --app-page-logo: url('/images/google-favicon-logo-3BBD7/Google_-G-_Logo.svg'); */
         --app-page-logo: url('/images/acquisio-logo.svg');
         --paper-stepper-horizontal-opened-height: 75vh;
         --paper-stepper-vertical-max-height: 75vh;
         --icon-w: 48px;
-        /* --paper-vertical-step-max-height: 80vh; */
         --paper-stepper-vertical-responsive-width: 700px;
         padding: 10px 20px;
       }
@@ -37,26 +35,21 @@
         display: grid;
         grid-template-columns: repeat(2, 1fr);
       }
-
       .label {
           font-weight: bold;
       }
-
       .slider-group .label {
         grid-row: 1;
         grid-column: 1 / -1;
         padding-bottom: 30px;
         color: #474747;
       }
-
       .slider-group .label:not(.first) {
         padding-top: 36px;
       }
-
       .slider-group .label .first {
         padding-top: 10px;
       }
-
       .start {
         text-align: left;
         grid-row: 3;
@@ -65,29 +58,24 @@
         text-align: right;
         grid-row: 3;
       }
-
       .slider-group paper-slider,
       .slider-group paper-range-slider {
         grid-row: 2;
         grid-column: 1 / -1;
         width: 100%;
       }
-
       .payment-grid {
         padding-top: 30px;
         display: grid;
         grid-template-columns: 1fr repeat(2, 350px) 1fr;
         grid-gap: 30px;
       }
-
       .payment-grid address-form {
           grid-column: 2;
       }
-
       .payment-grid cc-form {
           grid-column: 3;
       }
-
       @media only screen and (max-width: 800px) {
         .payment-grid {
           grid-template-columns: 1fr 350px 1fr;
@@ -100,82 +88,68 @@
           grid-column: 2;
         }
       }
-
       img.logo {
         src: ''
       }
-
       .grid-2col {
-          display: grid;
-          grid-template-columns: auto 1fr;
+        display: grid;
+        grid-template-columns: auto 1fr;
       }
-
       .left-col {
-          vertical-align: middle;
-          align-self: center;
-          align-items: center;
-          height: 100%;
-                    /* padding-right: 10px; */
+        vertical-align: middle;
+        align-self: center;
+        align-items: center;
+        height: 100%;
       }
-
       .left-col paper-button {
-          height: 100%;          
+        height: 100%;          
       }
-      
       .left-col div {
-          vertical-align: middle;
-          align-self: center;
-          padding-top: 2px;
+        vertical-align: middle;
+        align-self: center;
+        padding-top: 2px;
       }
-
       .right-col {
-          text-align: right;
-          display: grid;
-          grid-template-columns: 1fr auto;
+        text-align: right;
+        display: grid;
+        grid-template-columns: 1fr auto;
       }
-
       .right-col div {
-          padding-right: 10px;
+        padding-right: 10px;
       }
-
       .info {
-          background-color: var(--app-primary-color);
-          color: #fff;
-          /* width: 100%;*/
-          padding: 10px;
-          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        background-color: var(--app-primary-color);
+        color: #fff;
+        padding: 10px;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
       }
-
       .subtitle {
-          font-size: 10pt;
-          font-weight: normal;
+        font-size: 10pt;
+        font-weight: normal;
       }
-
       .budget-group {
-          display: grid;
-          grid-template-columns: 1fr 1px 1fr;
-          grid-gap: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1px 1fr;
+        grid-gap: 20px;
       }
-
       .budget-group .verticalborder {
-          border: rgba(0, 0, 0, 0.12) 1px solid;
+        border: rgba(0, 0, 0, 0.12) 1px solid;
       }
-
       .title-icon {
         color: rgba(0,0,0,0.1);
         width: var(--icon-w);
         height: var(--icon-w);
       }
       .section-title {
-          margin-top: -10px;
-          color: #474747;
+        margin-top: -10px;
+        color: #474747;
       }
       .title-group {
-          display: grid;
-          grid-template-columns: 1fr auto;
+        display: grid;
+        grid-template-columns: 1fr auto;
       }
-
     </style>
+
     <div class="stepper-container">
         <div class="main-content">
         <template is="dom-if" if="[[showInfo]]">
@@ -251,49 +225,13 @@
                 </template>
             </div>
         </paper-step>
-        <!-- <paper-step label="Retail Settings" editable hidden$="[[!isRetail]]">
-            
-        </paper-step> -->
+
         <paper-step label="Payment">
           <div class="payment-grid">
-            <!-- <address-form verbose
-                street="{{street}}"
-                city="{{city}}"
-                state="{{state}}"
-                country="{{country}}"
-                zip="{{zip}}"
-                id="addressForm"
-                address-search-url="~/address/find"></address-form>
-            <cc-form preview-position="bottom"></cc-form> -->
           </div>
-          <!--
-          <form>
-            <label>
-              <input name="cardholder-name" class="field is-empty" placeholder="Jane Doe" />
-              <span><span>Name</span></span>
-            </label>
-            <label>
-              <input class="field is-empty" type="tel" placeholder="(123) 456-7890" />
-              <span><span>Phone number</span></span>
-            </label>
-            <label>
-              <div id="card-element" class="field is-empty"></div>
-              <span><span>Credit or debit card</span></span>
-            </label>
-            <button type="submit">Pay $25</button>
-            <div class="outcome">
-              <div class="error" role="alert"></div>
-              <div class="success">
-                Success! Your Stripe token is <span class="token"></span>
-              </div>
-            </div>
-          </form>
-          -->
         </paper-step>
       </paper-stepper>
         </div>
-      <!--<paper-button hidden$="[[isStarted]]" on-tap="startStepper" raised>Start</paper-button>
-      <paper-button on-tap="toggleVerical" raised>Toggle Vertical</paper-button> -->
       </div>
   </template>
 
@@ -603,7 +541,7 @@
 
       detached: function() {
         //console.log(this.localName + '#' + this.id + ' was detached');
-      },
+      }
 
     });
   </script>

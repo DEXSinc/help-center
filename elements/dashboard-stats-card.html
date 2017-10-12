@@ -1,0 +1,228 @@
+﻿<link rel="import" href="../lib/polymer/polymer.html">
+<link rel="import" href="../lib/granite-c3/granite-c3-polymer.1.x.html">
+
+<dom-module id="dashboard-stats-card">
+
+    <template>
+        <style>
+            :host {
+                display: grid;
+                grid-template-rows: 1fr auto;
+                font-size: 13px;
+                -webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,.07), 1px 2px 5px 0 rgba(0,0,0,.06);
+                box-shadow: 1px 1px 1px 0 rgba(0,0,0,.07), 1px 2px 5px 0 rgba(0,0,0,.06);
+                letter-spacing: .1px;
+            }
+            .h4, h4 {
+                font-size: 17px;
+            }
+            .body {
+                background-color: #42A5F5;
+                color: #fff;
+                padding: 10px;
+            }
+            .no-margin {
+                margin: 0 !important;
+            }
+            .w300 {
+                font-weight: 300;
+            }
+            .w600 {
+                font-weight: 600;
+            }
+            .white-text {
+                color: #FFF;
+            }
+            .f11 {
+                font-size: 11px;
+                line-height: 1;
+            }
+            .f11 span {
+                vertical-align: middle;
+            }
+            .f11 iron-icon {
+                --iron-icon-width: 13px;
+                --iron-icon-height: 13px;
+                width: 13px;
+                height: 13px;
+            }
+            .page-header .actions, .pull-right {
+                float: right !important;
+            }
+            .trending {
+                --iron-icon-width: 14px;
+                --iron-icon-height: 14px;
+                width: 14px;
+                height: 14px;
+            }
+            .card-content {
+                background-color: #fff;
+                color: #666;
+                padding: 15px;
+                box-sizing: border-box;
+            }
+            .row {
+                margin-left: -15px;
+                margin-right: -15px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+            /*.row:after, .row:before {
+                display: table;
+                content: " ";
+            }*/
+            .text-center {
+                text-align: center;
+            }
+            .grey-text, .page-header h1 i {
+                color: #9e9e9e;
+            }
+            .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+                font-family: inherit;
+                font-weight: 400;
+                line-height: 1.1;
+                color: #444;
+            }
+            .h3, h3 {
+                font-size: 23px;
+            }
+            :host .card-content p {
+                margin: 0;
+            }
+            .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9 {
+                position: relative;
+                min-height: 1px;
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            .p-10 {
+                padding: 10px;
+            }
+            .p-t-30 {
+                padding-top: 30px;
+            }
+
+            .chart {
+                display: flex;
+                height: 100px;
+                padding: 0;
+                margin: -13px;
+            }
+            /*@media (min-width: 992px) {
+                .col-md-6 {
+                    width: 50%;
+                }
+            }
+            @media (min-width: 992px) {
+                .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9 {
+                    float: left;
+                }
+            }*/
+        </style>
+        <!-- 
+            icons:trending-up
+            icons:trending-flat
+            icons:trending-down
+            icons:star-border
+        -->
+        <div class="body">
+            <div class="pull-right"><iron-icon class="trending" icon="icons:trending-up"></iron-icon>3%</div>
+            <h4 class="no-margin w600 white-text">Sales per day</h4>
+            <div class="f11" style="opacity: 0.8;">
+                <iron-icon icon="icons:star-border"></iron-icon>
+                <span>Latest 10 May, 10:00</span>
+            </div>
+            <div class="chart">
+                <granite-c3 data="[[gridData]]" axis="[[gridAxis]]" legend="[[gridLegend]]"></granite-c3>
+            </div>
+        </div>
+        <div class="card-content">
+            <div class="row">
+                <div class="col-md-6 text-center" style="border-right: 1px #F0F0F0 solid;">
+                    <h3 class="no-margin w300">$3,750,-</h3>
+                    <p class="grey-text w600">Total revenue</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <h3 class="no-margin w300">116</h3>
+                    <p class="grey-text w600">Total sales</p>
+                </div>
+            </div>
+        </div>
+
+    </template>
+
+    <script>
+var dummy = {
+    data: {
+        columns: [
+            ['data1', 30, 200, 100, 400, 150, 250],
+            ['data2', 50, 20, 10, 40, 15, 25]
+        ],
+        types: {
+            data1: 'area',
+            data2: 'area-spline'
+        },
+        colors: {
+            data1: 'rgba(255,255,255,0.33)',
+            data2: 'rgba(255,255,255,0.5)'
+        }
+    },
+    axis: {
+        x: {
+            show: false
+        },
+        y: {
+            show: false
+        }
+    },
+    legend: {
+        show: false
+    }
+};
+
+        Polymer({
+            is: 'dashboard-stats-card',
+            properties: {
+                verbose: {
+                    type: Boolean,
+                    value: false
+                },
+                gridData: {
+                    type: Object,
+                    value: function() {
+                        return dummy.data;
+                    }
+                },
+                gridAxis: {
+                    type: Object,
+                    value: function() {
+                        return dummy.axis;
+                    }
+                },
+                gridLegend: {
+                    type: Object,
+                    value: function() {
+                        return dummy.legend;
+                    }
+                }
+            },
+            _log: function (msg) {
+                if (this.verbose)
+                    console.log(msg);
+            },
+            observers: [
+
+            ],
+            ready: function () {
+                this._log('address-form ready');
+            },
+            attached: function () {
+                this._log('address-form attached');
+            },
+            detached: function () {
+                this._log('address-form detached');
+            }
+        });
+    </script>
+
+</dom-module>

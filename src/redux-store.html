@@ -127,7 +127,13 @@
                     }
                 ]
             }
-        ]
+        ],
+        dynamo: {
+            graphs: {
+                summary: []
+            },
+            inventory: []
+        }
     };
 
     const reducer = (state, action) => {
@@ -163,6 +169,18 @@
                 var pageTitle = state.pageTitles[action.data.page] || state.pageTitles['home'];
                 return Object.assign({}, state, { routeData: action.data, page: { title: pageTitle, name: action.data.page } });
             }
+            case 'DYNAMO_DATA_CHANGED': {
+                var newData = action.data;
+                var dynamo = state.dynamo;
+                dynamo.graphs[action.path] = newData;
+                return Object.assign({}, state, { dynamo: dynamo });
+            }
+            case 'DYNAMO_INVENTORY_CHANGED': {
+                var newData = action.inventory;
+                var dynamo = Object.assign({}, state.dynamo);
+                dynamo.inventory = newData;
+                return Object.assign({}, state, { dynamo: dynamo });
+            }
             default: 
                 return state;
         }
@@ -180,6 +198,17 @@
      */
     const ReduxBehavior = PolymerRedux(store);
 
+    const getData = function(path, params, callback) {
+        var ajax = new XMLHttpRequest();
+        ajax.open("GET", path, true);
+        ajax.send();
+        ajax.onreadystatechange = function() {
+            if (ajax.readyState == 4 && ajax.status == 200) {
+                var data = JSON.parse(ajax.responseText);
+                callback(data);
+            }
+        }
+    }
     /**
      * Behavior that highlights stuff.
      *
@@ -193,6 +222,20 @@
                     setTimeout(function() {
                         dispatch({ type: 'SIGN_UP_COMPLETED', username: username });
                     }, 3000);
+                }
+            },
+            getDynamoData: function(path) {
+                return function(dispatch) {
+                    var callback = function(data) {
+                        console.log(data);
+                        dispatch({ type: 'DYNAMO_DATA_CHANGED', path: path, data: data });
+                    }
+                    var callback2 = function(data) {
+                        console.log(data);
+                        dispatch({ type: 'DYNAMO_INVENTORY_CHANGED', inventory: data })
+                    }
+                    getData('src/views/dynamo/data0.json', null, callback);
+                    getData('src/views/dynamo/inventory0.json', null, callback2);
                 }
             }
         }

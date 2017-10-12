@@ -1,0 +1,30 @@
+[
+    {
+        "rank": 1,
+        "image": "images/inventory/0.jpg",
+        "productName": "Liview\u00AE 8CH Full 960H DBR",
+        "sales": 8,
+        "revenue": 1072.80
+    },
+    {
+        "rank": 2,
+        "image": "images/inventory/1.jpg",
+        "productName": "Android 6.0 6.2-inch Car DVD Player",
+        "sales": 6,
+        "revenue": 945.16
+    },
+    {
+        "rank": 3,
+        "image": "images/inventory/2.jpg",
+        "productName": "GPS Positioner",
+        "sales": 5,
+        "revenue": 321.06
+    },
+    {
+        "rank": 4,
+        "image": "images/inventory/3.jpg",
+        "productName": "Lenovo Yoga Tab 3 10.1 inch",
+        "sales": 2,
+        "revenue": 1445.58
+    }
+]

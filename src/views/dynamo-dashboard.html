@@ -1,5 +1,12 @@
 <link rel="import" href="../../lib/polymer/polymer.html">
 <link rel="import" href="../../lib/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../../lib/nvd3-elements/nvd3-line.html">
+<link rel="import" href="../../lib/vaadin-material-theme/vaadin-grid.html">
+<link rel="import" href="../../lib/vaadin-grid/vaadin-grid-sorter.html">
+<link rel="import" href="../../lib/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../../lib/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../lib/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../lib/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../redux-store.html">
 <link rel="import" href="./dynamo/dynamo-plan-chooser.html">
 <link rel="import" href="./dynamo/dynamo-package-chooser.html">
@@ -13,9 +20,23 @@
     <style>
       :host {
         display: block;
+        --paper-item-body-secondary: {
+          font-size: 12px;
+          color: #fefefe;
+        }
         /* font-size: 0.9rem; */
       }
+      paper-card.single paper-item-body {
+        --paper-item-body-secondary: {
+          font-size: 12px;
+          color: #737373;
+        }
+      }
       .container {
+        padding: 10px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 10px;
         /*font-size: 14px;
         display: grid;
         grid-template-columns: auto 1fr auto;
@@ -47,7 +68,6 @@
       .row :not(:first-child) {
         padding-left: 10px;
       }
-
       .heading {
         width: 100%;
         padding: 10px 0 10px 0;
@@ -59,9 +79,319 @@
         text-transform: uppercase;
         color: var(--app-subtitle-color);
       }
+      .wide {
+        grid-column: 1 / -1;
+        /* margin: 10px; */
+      }
+      .card-header paper-item-body {
+        padding: 0px;
+        padding-left: 16px;
+        padding-right: 16px;
+        border-bottom: 1px solid #ddd;
+        background-color: #424242;
+        color: #ffffff;
+      }
+      paper-card.rising {
+        background-color: #F9FFF8;
+        background: rgb(255,255,255); /* Old browsers */
+        background: -moz-linear-gradient(top, rgba(255,255,255,1) 36%, rgba(249,255,248,1) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(top, rgba(255,255,255,1) 36%,rgba(249,255,248,1) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to bottom, rgba(255,255,255,1) 36%,rgba(249,255,248,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f9fff8',GradientType=0 );
+      }
+      paper-card.falling {
+        background-color: rgb(255, 239, 239);
+        background: rgb(255,255,255); /* Old browsers */
+        background: -moz-linear-gradient(top, rgba(255,255,255,1) 36%, rgba(253,237,237,1) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(top, rgba(255,255,255,1) 36%,rgba(253,237,237,1) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to bottom, rgba(255,255,255,1) 36%,rgba(253,237,237,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#fdeded',GradientType=0 );
+      }
+      iron-icon.rising {
+        color: green;
+        height: 16px;
+      }
+      iron-icon.falling {
+        color: maroon;
+        height: 16px;
+      }
+      .card-icon {
+        height: 64px;
+        width: 64px;
+        text-align: center;
+      }
+      paper-card.single {
+        text-align: center;
+      }
+      .card-stat {
+        font-size: 40px;
+      }
+      .card-stat::before {
+        content: ' ';
+        padding-left: 33px;
+      }
+      .centered-cell {
+        --vaadin-grid-cell: {
+          text-align: center;
+        }
+      }
+      @media screen and (max-width: 1139px) {
+        .container {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media screen and (max-width: 950px) {
+        .container {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media screen and (max-width: 400px) {
+        .container {
+          grid-template-columns: repeat(1, 1fr);
+        }
+      }
+      .thumbnail {
+        margin: 5px;
+        width: 50px;
+        height: 50px;
+        border-radius: 100px;
+        border: 2px solid #CCC;
+      }
+
+      vaadin-grid {
+        border: 0;
+        --vaadin-grid-cell: {
+          border: 0;
+        }
+      }
+
+      .product-item {
+        padding: 5px;
+      }
+
+      .card-content-full paper-item {
+        display: grid;
+        grid-template-columns: 100px repeat(2, minmax(50px, 1fr));
+      }
+
+      .product-image {
+        grid-row: 1 / 10;
+      }
+
+      .product-title {
+        grid-column: 2 / -1;
+      }
+
+      .product-info {
+        color: #ccc;
+        font-size: 0.8em;
+      }
+
+      .product-rank {
+        border: 1px solid #ccc;
+        color: #424242;
+        border-radius: 3px;
+        display: inline;
+        padding: 2px 8px;
+      }
+
+      .header-menu {
+        position: absolute;
+        right: 0;
+        top: 0;
+        --paper-menu-button-content: {
+          color: #424242;
+        }
+      }
+      .h4, h4 {
+          font-size: 17px;
+      }
+      .h4 span, h4 span {
+        vertical-align: text-top;
+        padding-left: 10px;
+      }
+      .h4, .h5, .h6, h4, h5, h6 {
+          margin-top: 11.5px;
+          margin-bottom: 11.5px;
+      }
+      .grey-text, .page-header h1 i {
+          color: #9e9e9e;
+      }
     </style>
+
     <div class="container">
-        <div class="dashboard">
+      <h4 class="wide grey-text">
+        <iron-icon icon="icons:dashboard"></iron-icon><span>Performance summary and KPI's</span>
+      </h4>
+      <dashboard-stats-card class="single"></dashboard-stats-card>
+      <paper-card class="single rising">
+          <paper-ripple></paper-ripple>
+          <div class="card-content">
+              <div class="card-stat">116 <iron-icon class="rising" icon="icons:arrow-upward"></iron-icon></div>
+              <!-- <iron-icon class="card-icon" icon="icons:pageview"></iron-icon> -->
+              <paper-item-body two-line>
+                  <div>Clicks</div>
+                  <div secondary>updated about 1 day ago</div>
+              </paper-item-body>
+          </div>
+      </paper-card>
+      <paper-card class="single falling">
+        <paper-ripple></paper-ripple>
+          <div class="card-content">
+              <div class="card-stat">$350 <iron-icon class="falling" icon="icons:arrow-downward"></iron-icon></div>
+              <!-- <iron-icon class="card-icon" icon="icons:pageview"></iron-icon> -->
+              <paper-item-body two-line>
+                  <div>Cost</div>
+                  <div secondary>updated about 1 day ago</div>
+              </paper-item-body>
+          </div>
+      </paper-card>
+      <paper-card class="single rising">
+          <paper-ripple></paper-ripple>
+          <div class="card-content">
+              <div class="card-stat">25 <iron-icon class="rising" icon="icons:arrow-upward"></iron-icon></div>
+              <!-- <iron-icon class="card-icon" icon="icons:pageview"></iron-icon> -->
+              <paper-item-body two-line>
+                  <div>Sales</div>
+                  <div secondary>updated about 1 day ago</div>
+              </paper-item-body>
+          </div>
+      </paper-card>
+      <paper-card class="single rising">
+          <paper-ripple></paper-ripple>
+          <div class="card-content">
+              <div class="card-stat">$3,750 <iron-icon class="rising" icon="icons:arrow-upward"></iron-icon></div>
+              <!-- <iron-icon class="card-icon" icon="icons:pageview"></iron-icon> -->
+              <paper-item-body two-line>
+                  <div>Revenue</div>
+                  <div secondary>updated about 1 day ago</div>
+              </paper-item-body>
+          </div>
+      </paper-card>
+      <paper-card class="wide">
+          <paper-icon-item class="card-header">
+              <paper-item-body two-line>
+                  <div style="display: flex;">
+                    <div style="flex: 1;">Overview</div>
+                    <paper-menu-button class="header-menu">
+                        <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu class="dropdown-content">
+                          <paper-item>Share</paper-item>
+                          <paper-item>Settings</paper-item>
+                          <paper-item>Help</paper-item>
+                        </paper-menu>
+                      </paper-menu-button>
+                  </div>
+                  <div secondary>Stats for [[periodString]]</div>
+              </paper-item-body>
+          </paper-icon-item>
+          <div class="card-content">
+              <nvd3-line
+                class="line-chart"
+                data="[[data]]"
+                height="200"
+                x-axis-labels="[[dataLabels]]"
+                auto-resize
+                show-legend
+                use-interactive-guideline>
+            </nvd3-line>
+          </div>
+      </paper-card>
+
+      <paper-card class="wide">
+          <paper-icon-item class="card-header">
+              <paper-item-body two-line>
+                  <div style="display: flex;">
+                    <div style="flex: 1;">Top Products</div>
+                    <paper-menu-button class="header-menu">
+                        <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu class="dropdown-content">
+                          <paper-item>Share</paper-item>
+                          <paper-item>Settings</paper-item>
+                          <paper-item>Help</paper-item>
+                        </paper-menu>
+                      </paper-menu-button>
+                  </div>
+                  <div secondary>[[periodString]]</div>
+              </paper-item-body>
+          </paper-icon-item>
+          <div class="card-content-full">
+              <template is="dom-repeat" items="[[inventory]]">
+                <paper-item class="product-item">
+                  <div class="product-image"><img class="thumbnail" src$="[[item.image]]"></div>
+                  <div class="product-title">[[item.productName]]</div>
+                  <div class="product-info">[[item.sales]] Sale(s)</div>
+                  <div class="product-info"><div class="product-rank">Ranked #[[item.rank]]</div></div>
+                  <div class="product-info">$[[item.revenue]] in generated revenue.</div>
+                </paper-item>
+              </template>
+          </div>
+      </paper-card>
+
+      <!--
+      <paper-card class="wide">
+        <paper-icon-item class="card-header">
+            <paper-item-body two-line>
+                <div>Top Products</div>
+                <div secondary>[[periodString]]</div>
+            </paper-item-body>
+        </paper-icon-item>
+        <div class="card-content">
+          <vaadin-grid aria-label="Sorting Example" items="[[inventory]]" multi-sort="[[multiSort]]">
+            <vaadin-grid-column flex-grow="0">
+              <template class="header">
+                <vaadin-grid-sorter path="rank" direction="asc">Rank</vaadin-grid-sorter>
+              </template>
+              <template>[[item.rank]]</template>
+            </vaadin-grid-column>
+            <vaadin-grid-column flex-grow="0" width="75px">
+              <template class="header">Image</template>
+              <template><img class="thumbnail" src$="[[item.image]]"></template>
+            </vaadin-grid-column>
+            <vaadin-grid-column >
+              <template class="header">
+                <vaadin-grid-sorter path="productName">Product Name</vaadin-grid-sorter>
+              </template>
+              <template>[[item.productName]]</template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="150px" flex-grow="0">
+              <template class="header">
+                <vaadin-grid-sorter path="sales">Sales</vaadin-grid-sorter>
+              </template>
+              <template>[[item.sales]]</template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="150px" flex-grow="0">
+              <template class="header centered-cell">
+                <vaadin-grid-sorter path="revenue">Revenue</vaadin-grid-sorter>
+              </template>
+              <template>
+                <div class="centered-cell">[[item.revenue]]</div>
+              </template>
+            </vaadin-grid-column>
+          </vaadin-grid>
+        </div>
+      </paper-card> -->
+      <!--
+      <paper-card class="single">
+          <div class="card-content">
+              <div class="card-stat">203 <iron-icon class="rising" icon="icons:arrow-upward"></iron-icon></div>
+              <paper-item-body two-line>
+                  <div>Total Sales</div>
+                  <div secondary>updated about 1 day ago</div>
+              </paper-item-body>
+          </div>
+      </paper-card>
+      <paper-card class="single">
+          <div class="card-content">
+              <div class="card-stat">$31,430 <iron-icon class="rising" icon="icons:arrow-upward"></iron-icon></div>
+              <paper-item-body two-line>
+                  <div>Total Revenue</div>
+                  <div secondary>updated about 1 day ago</div>
+              </paper-item-body>
+          </div>
+      </paper-card> 
+      -->
+        <!-- <div class="dashboard">
           <div class="overview">
             <div class="heading">overview</div>
             <div class="row">
@@ -93,7 +423,7 @@
 
               </div>
             </div>
-          </div>
+          </div> -->
     </div>
     
   </template>
@@ -101,11 +431,23 @@
   <script>
     Polymer({
       is: 'app-dynamo-dashboard',
-      behaviors: [ ReduxBehavior ],
+      behaviors: [ ReduxBehavior, AsyncActionsBehavior ],
       properties: {
         _isReady: {
           type: Boolean,
           value: false
+        },
+        data: {
+          type: Array,
+          statePath: 'dynamo.graphs.summary.data'
+        },
+        dataLabels: {
+          type: Object,
+          statePath: 'dynamo.graphs.summary.labels'
+        },
+        inventory: {
+          type: Array,
+          statePath: 'dynamo.inventory'
         },
         queryParameters: {
           type: Object,
@@ -122,13 +464,13 @@
         periodStart: {
           type: Date,
           value: function() {
-            return new Date();
+            return new Date("2017-09-01T00:00:00");
           }
         },
         periodEnd: {
           type: Date,
           value: function() {
-            return new Date();
+            return new Date("2017-09-30T23:59:59");
           }
         },
         periodString: {
@@ -168,6 +510,11 @@
         }
       },
 
+      loadGraphs: function() {
+        // let username = this.$.user.value;
+        this.dispatch('getDynamoData', 'summary');
+      },
+
       created: function() {
         //console.log(this.localName + '#' + this.id + ' was created');
       },
@@ -179,7 +526,7 @@
       attached: function() {
         //console.log(this.localName + '#' + this.id + ' was attached');
         this._isReady = true;
-
+        this.loadGraphs();
       },
 
       detached: function() {
