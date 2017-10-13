@@ -132,7 +132,8 @@
             graphs: {
                 summary: []
             },
-            inventory: []
+            inventory: [],
+            seriesData: {}
         }
     };
 
@@ -175,6 +176,11 @@
                 dynamo.graphs[action.path] = newData;
                 return Object.assign({}, state, { dynamo: dynamo });
             }
+            case 'DYNAMO_SERIES_DATA_CHANGED': {
+                var dynamo = Object.assign({}, state.dynamo);
+                dynamo.seriesData = action.data;
+                return Object.assign({}, state, { dynamo: dynamo });
+            }
             case 'DYNAMO_INVENTORY_CHANGED': {
                 var newData = action.inventory;
                 var dynamo = Object.assign({}, state.dynamo);
@@ -192,9 +198,7 @@
     );
 
     /**
-     * Behavior that highlights stuff.
-     *
-     * @polymerBehavior
+     * @polymerBehavior ReduxBehavior
      */
     const ReduxBehavior = PolymerRedux(store);
 
@@ -209,10 +213,9 @@
             }
         }
     }
+
     /**
-     * Behavior that highlights stuff.
-     *
-     * @polymerBehavior
+     * @polymerBehavior AsyncActionsBehavior
      */
     const AsyncActionsBehavior = {
         actions: {
@@ -227,15 +230,20 @@
             getDynamoData: function(path) {
                 return function(dispatch) {
                     var callback = function(data) {
-                        console.log(data);
+                        // console.log(data);
                         dispatch({ type: 'DYNAMO_DATA_CHANGED', path: path, data: data });
                     }
                     var callback2 = function(data) {
-                        console.log(data);
+                        // console.log(data);
                         dispatch({ type: 'DYNAMO_INVENTORY_CHANGED', inventory: data })
                     }
-                    getData('src/views/dynamo/data0.json', null, callback);
-                    getData('src/views/dynamo/inventory0.json', null, callback2);
+                    var callback3 = function(data) {
+                        // console.log(data);
+                        dispatch({ type: 'DYNAMO_SERIES_DATA_CHANGED', data: data })
+                    }
+                    getData('data/dynamo/data0.json', null, callback);
+                    getData('data/dynamo/inventory0.json', null, callback2);
+                    getData('data/dynamo/data1.json', null, callback3);
                 }
             }
         }

@@ -7,8 +7,27 @@
     "src/views/faqs.html",
     "src/views/dynamo.html",
     "src/views/dynamo-dashboard.html",
-    "src/views/vide1.html",
+    "src/views/view1.html",
     "src/views/view404.html",
     "src/views/videos.html"
+  ],
+  "sources": [
+    "src/**/*",
+    "assets/**/*",
+    "images/**/*",
+    "data/**/*",
+    "bower.json"
+   ],
+   "extraDependencies": [
+    "manifest.json",
+    "lib/webcomponentsjs/webcomponents-lite.min.js",
+    "lib/lodash/lodash.js"
+  ],
+  "lint": {
+    "rules": ["polymer-2-hybrid"]
+  },
+  "builds": [
+    { "preset": "es5-bundled" },
+    { "preset": "es6-unbundled" }
   ]
 }
