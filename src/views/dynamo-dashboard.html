@@ -8,24 +8,31 @@
 <link rel="import" href="../../lib/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../lib/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../../lib/toggle-icon/toggle-icon.html">
+<link rel="import" href="../../lib/paper-card/paper-card.html">
+<link rel="import" href="../../lib/paper-item/paper-item.html">
 <link rel="import" href="../redux-store.html">
+<link rel="import" href="../redux-async.html">
 <link rel="import" href="./dynamo/dynamo-plan-chooser.html">
 <link rel="import" href="./dynamo/dynamo-package-chooser.html">
 <link rel="import" href="./dynamo/dynamo-stepper.html">
 <link rel="import" href="./dynamo/dynamo-complete.html">
 <link rel="import" href="./dynamo/dynamo-product-filter.html">
 <link rel="import" href="./dynamo/dynamo-payment-capture.html">
+<link rel="import" href="../../elements/dashboard-stats-card.html">
+<link rel="import" href="../../elements/app-logger.html">
 
 <dom-module id="app-dynamo-dashboard">
   <template>
     <style>
+      :focus {
+          outline: none;
+      }
       :host {
         display: block;
         --paper-item-body-secondary: {
           font-size: 12px;
           color: #fefefe;
         }
-        /* font-size: 0.9rem; */
       }
       
       paper-card.single paper-item-body {
@@ -40,10 +47,6 @@
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         grid-gap: 10px;
-        /*font-size: 14px;
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-        grid-gap: 30px;*/
       }
       .dashboard {
         grid-column: 2;
@@ -54,19 +57,11 @@
         padding-left: 20px;
         align-items: flex-start;
       }
-      /*
-      .overview {
-        display: flex;
-        flex-wrap: wrap;
-        padding-left: 20px;
-        align-items: flex-start;
-      } */ 
       .row {
         color: var(--app-subtitle-color);
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        /* height: 100px; */
       }
       .row :not(:first-child) {
         padding-left: 10px;
@@ -84,7 +79,6 @@
       }
       .wide {
         grid-column: 1 / -1;
-        /* margin: 10px; */
       }
       .card-header paper-item-body {
         padding: 0px;
@@ -161,11 +155,19 @@
         border: 2px solid #CCC;
       }
 
-      vaadin-grid {
+      vaadin-grid, vaadin-grid.active, vaadin-grid.focused {
         border: 0;
+        outline: none;
         --vaadin-grid-cell: {
-          border: 0;
-        }
+          /* border: 0;*/ 
+          outline: none;
+        };
+        --vaadin-grid-table: {
+          outline: none;
+        };
+      }
+      vaadin-grid-table {
+        outline: none;
       }
 
       .product-item {
@@ -218,7 +220,7 @@
           margin-bottom: 11.5px;
       }
       .grey-text, .page-header h1 i {
-          color: #9e9e9e;
+          color: var(--app-title-color);
       }
       .blue {
         --stat-card-background-color: #42A5F5;
@@ -262,106 +264,16 @@
             tooltip="toggle charts"
             class="green-red">
           </toggle-icon>
-          <!-- <paper-toggle-button checked="{{showCharts}}" noink>graphs</paper-toggle-button>-->
         </div>
       </div>
       <template is="dom-repeat" items="[[stats]]">
-          <dashboard-stats-card hide-chart$="[[!showCharts]]" class$="single [[item.color]]" title="[[item.title]]" subtitle="[[item.subtitle]]" trend="[[item.trend]]" stats="[[item.items]]" grid-data="[[_getSeriesGraphData(item.graph)]]"></dashboard-stats-card>
+          <dashboard-stats-card hide-chart$="[[!showCharts]]" class$="single [[item.color]]" title="[[item.title]]" subtitle="[[item.subtitle]]" trend="[[item.trend]]" stats="[[item.items]]" trendtip="[[item.trendtip]]" grid-data="[[_getSeriesGraphData(item.graph)]]"></dashboard-stats-card>
       </template>
-      <!-- <dashboard-stats-card class="single green" title="Sales per day" subtitle="Latest 10 May, 10:00" trend="10"></dashboard-stats-card>
-      <dashboard-stats-card class="single pink" title="Sales per day" subtitle="Latest 10 May, 10:00" trend="-5"></dashboard-stats-card>
-      <dashboard-stats-card class="single orange" title="Sales per day" subtitle="Latest 10 May, 10:00" trend="0"></dashboard-stats-card> -->
-
-      <!--<paper-card class="single rising">
-          <paper-ripple></paper-ripple>
-          <div class="card-content">
-              <div class="card-stat">116 <iron-icon class="rising" icon="icons:arrow-upward"></iron-icon></div>
-              <paper-item-body two-line>
-                  <div>Clicks</div>
-                  <div secondary>updated about 1 day ago</div>
-              </paper-item-body>
-          </div>
-      </paper-card>
-      <paper-card class="single falling">
-        <paper-ripple></paper-ripple>
-          <div class="card-content">
-              <div class="card-stat">$350 <iron-icon class="falling" icon="icons:arrow-downward"></iron-icon></div>
-              <paper-item-body two-line>
-                  <div>Cost</div>
-                  <div secondary>updated about 1 day ago</div>
-              </paper-item-body>
-          </div>
-      </paper-card>
-      <paper-card class="single rising">
-          <paper-ripple></paper-ripple>
-          <div class="card-content">
-              <div class="card-stat">25 <iron-icon class="rising" icon="icons:arrow-upward"></iron-icon></div>
-              <paper-item-body two-line>
-                  <div>Sales</div>
-                  <div secondary>updated about 1 day ago</div>
-              </paper-item-body>
-          </div>
-      </paper-card>
-      <paper-card class="single rising">
-          <paper-ripple></paper-ripple>
-          <div class="card-content">
-              <div class="card-stat">$3,750 <iron-icon class="rising" icon="icons:arrow-upward"></iron-icon></div>
-              <paper-item-body two-line>
-                  <div>Revenue</div>
-                  <div secondary>updated about 1 day ago</div>
-              </paper-item-body>
-          </div>
-      </paper-card>-->
-      <!--<paper-card class="wide">
-          <paper-icon-item class="card-header">
-              <paper-item-body two-line>
-                  <div style="display: flex;">
-                    <div style="flex: 1;">Overview</div>
-                    <paper-menu-button class="header-menu">
-                        <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
-                        <paper-menu class="dropdown-content">
-                          <paper-item>Share</paper-item>
-                          <paper-item>Settings</paper-item>
-                          <paper-item>Help</paper-item>
-                        </paper-menu>
-                      </paper-menu-button>
-                  </div>
-                  <div secondary>Stats for [[periodString]]</div>
-              </paper-item-body>
-          </paper-icon-item>
-          <div class="card-content">
-              <nvd3-line
-                class="line-chart"
-                data="[[data]]"
-                height="200"
-                x-axis-labels="[[dataLabels]]"
-                auto-resize
-                show-legend
-                use-interactive-guideline>
-            </nvd3-line>
-          </div>
-      </paper-card>-->
 
       <h4 class="wide grey-text">
         <iron-icon icon="icons:dashboard"></iron-icon><span>Product performance</span>
       </h4>
-      <paper-card class="wide">
-          <!--<paper-icon-item class="card-header">
-              <paper-item-body two-line>
-                  <div style="display: flex;">
-                    <div style="flex: 1;">Top Products</div>
-                    <paper-menu-button class="header-menu">
-                        <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
-                        <paper-menu class="dropdown-content">
-                          <paper-item>Share</paper-item>
-                          <paper-item>Settings</paper-item>
-                          <paper-item>Help</paper-item>
-                        </paper-menu>
-                      </paper-menu-button>
-                  </div>
-                  <div secondary>[[periodString]]</div>
-              </paper-item-body>
-          </paper-icon-item>-->
+      <!-- <paper-card class="wide">
           <div class="card-content-full">
               <template is="dom-repeat" items="[[inventory]]">
                 <paper-item class="product-item">
@@ -373,104 +285,42 @@
                 </paper-item>
               </template>
           </div>
-      </paper-card>
-
-      <!--
-      <paper-card class="wide">
-        <paper-icon-item class="card-header">
-            <paper-item-body two-line>
-                <div>Top Products</div>
-                <div secondary>[[periodString]]</div>
-            </paper-item-body>
-        </paper-icon-item>
-        <div class="card-content">
-          <vaadin-grid aria-label="Sorting Example" items="[[inventory]]" multi-sort="[[multiSort]]">
-            <vaadin-grid-column flex-grow="0">
-              <template class="header">
-                <vaadin-grid-sorter path="rank" direction="asc">Rank</vaadin-grid-sorter>
-              </template>
-              <template>[[item.rank]]</template>
-            </vaadin-grid-column>
-            <vaadin-grid-column flex-grow="0" width="75px">
-              <template class="header">Image</template>
-              <template><img class="thumbnail" src$="[[item.image]]"></template>
-            </vaadin-grid-column>
-            <vaadin-grid-column >
-              <template class="header">
-                <vaadin-grid-sorter path="productName">Product Name</vaadin-grid-sorter>
-              </template>
-              <template>[[item.productName]]</template>
-            </vaadin-grid-column>
-            <vaadin-grid-column width="150px" flex-grow="0">
-              <template class="header">
-                <vaadin-grid-sorter path="sales">Sales</vaadin-grid-sorter>
-              </template>
-              <template>[[item.sales]]</template>
-            </vaadin-grid-column>
-            <vaadin-grid-column width="150px" flex-grow="0">
-              <template class="header centered-cell">
-                <vaadin-grid-sorter path="revenue">Revenue</vaadin-grid-sorter>
-              </template>
-              <template>
-                <div class="centered-cell">[[item.revenue]]</div>
-              </template>
-            </vaadin-grid-column>
-          </vaadin-grid>
-        </div>
       </paper-card> -->
-      <!--
-      <paper-card class="single">
-          <div class="card-content">
-              <div class="card-stat">203 <iron-icon class="rising" icon="icons:arrow-upward"></iron-icon></div>
-              <paper-item-body two-line>
-                  <div>Total Sales</div>
-                  <div secondary>updated about 1 day ago</div>
-              </paper-item-body>
-          </div>
-      </paper-card>
-      <paper-card class="single">
-          <div class="card-content">
-              <div class="card-stat">$31,430 <iron-icon class="rising" icon="icons:arrow-upward"></iron-icon></div>
-              <paper-item-body two-line>
-                  <div>Total Revenue</div>
-                  <div secondary>updated about 1 day ago</div>
-              </paper-item-body>
-          </div>
-      </paper-card> 
-      -->
-        <!-- <div class="dashboard">
-          <div class="overview">
-            <div class="heading">overview</div>
-            <div class="row">
-              <div class="subheading">stats for</div>
-              <time datetime="[[periodStart]]">[[periodString]]</time>
-              <paper-dropdown-menu no-label-float label="Date Range">
-                  <paper-listbox slot="dropdown-content" class="dropdown-content" selected="1">
-                    <paper-item>This Month</paper-item>
-                    <paper-item>Last Month</paper-item>
-                    <paper-item>This Year</paper-item>
-                    <paper-item>Custom</paper-item>
-                  </paper-listbox>
-                </paper-dropdown-menu>
-            </div>
-          </div>
-          <div class="budget-pacing">
-              <div class="heading">budget pacing for month</div>
-              <div class="row">
-                <img src="/images/sample-bar.png"/>
-                <div>Spend $275</div>
-                <div>Monthly Budget | $500</div>
-                <div class="action" style="color: var(--app-secondary-color);">Adjust Budget</div>
-              </div>
-            </div>
-          </div>
-          <div class="budget-pacing">
-              <div class="heading">Retail</div>
-              <div class="row-grid">
 
-              </div>
-            </div>
-          </div> -->
+      <paper-card class="wide" style="padding: 18px;">
+        <vaadin-grid items="[[inventory]]">
+            <vaadin-grid-column flex-grow="0">
+                <template class="header">&nbsp;</template>
+                <template><div class="product-image"><img class="thumbnail" src$="[[item.image]]"></div></template>
+              </vaadin-grid-column>
+              <vaadin-grid-column flex-grow="1">
+                  <template class="header">product</template>
+                  <template>
+                    <div style="display: grid;">
+                      <div class="product-title">[[item.productName]]</div>
+                      <div class="product-info"><div class="product-rank">Ranked #[[item.rank]]</div></div>
+                    </div>
+                  </template>
+              </vaadin-grid-column>
+              <vaadin-grid-column flex-grow="0">
+                  <template class="header">views</template>
+                  <template>[[item.impressions]]</template>
+              </vaadin-grid-column>
+              <vaadin-grid-column flex-grow="0">
+                  <template class="header">clicks</template>
+                  <template>[[item.clicks]]</template>
+              </vaadin-grid-column>
+              <vaadin-grid-column flex-grow="0">
+                  <template class="header">sales</template>
+                  <template>[[item.sales]]</template>
+              </vaadin-grid-column>
+              <vaadin-grid-column flex-grow="0">
+                  <template class="header">revenue</template>
+                  <template>$[[item.revenue]]</template>
+              </vaadin-grid-column>
+        </vaadin-grid>
+      </paper-card>
+
     </div>
     
   </template>
@@ -478,7 +328,7 @@
   <script>
     Polymer({
       is: 'app-dynamo-dashboard',
-      behaviors: [ ReduxBehavior, AsyncActionsBehavior ],
+      behaviors: [ ReduxBehavior, AsyncActionsBehavior, AppLogger ],
       properties: {
         _isReady: {
           type: Boolean,
@@ -592,31 +442,27 @@
         this._log(seriesData);
       },
 
-      _log: function(e) {
-        if (!!this.debug) { console.log(e); }
-      },
-
       loadGraphs: function() {
         // let username = this.$.user.value;
         this.dispatch('getDynamoData', 'summary');
       },
 
       created: function() {
-        //console.log(this.localName + '#' + this.id + ' was created');
+        this._log(this.localName + '#' + this.id + ' was created');
       },
 
       ready: function() {
-        //console.log(this.localName + '#' + this.id + ' has local DOM initialized');
+        this._log(this.localName + '#' + this.id + ' has local DOM initialized');
       },
 
       attached: function() {
-        //console.log(this.localName + '#' + this.id + ' was attached');
+        this._log(this.localName + '#' + this.id + ' was attached');
         this._isReady = true;
         this.loadGraphs();
       },
 
       detached: function() {
-        //console.log(this.localName + '#' + this.id + ' was detached');
+        this._log(this.localName + '#' + this.id + ' was detached');
       },
 
     });

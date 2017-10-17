@@ -1,51 +1,55 @@
 {
 	"stats": [
 		{
-			"name": "sales",
-			"graph": "sales",
-			"color": "blue",
-			"title": "Sales per day",
-			"subtitle": "Latest 30 Sept, 11:59",
-			"trend": 3,
-			"items": [
-                { "title": "Total sales", "value": "21" },
-                { "title": "Total revenue", "value": "$3,750" }
-            ]
-		},
-		{
-			"name": "cost",
+			"name": "traffic",
 			"graph": "clicks",
-			"color": "green",
-			"title": "Clicks per day",
-			"subtitle": "Latest 30 Sept, 11:59",
+			"color": "blue",
+			"title": "Engagement",
+			"subtitle": "Compared with Last Month",
 			"trend": 10,
+			"trendtip": "Click Through Rate",
 			"items": [
-                { "title": "Total clicks", "value": "116" },
-                { "title": "Total cost", "value": "$350" }
+                { "title": "Views", "value": "256" },
+                { "title": "Clicks", "value": "116" }
             ]
 		},
 		{
 			"name": "revenue",
 			"graph": "revenue",
-			"color": "pink",
-			"title": "Conversions per day",
-			"subtitle": "Latest 30 Sept, 11:59",
-			"trend": -5,
+			"color": "green",
+			"title": "Revenue",
+			"subtitle": "Compared with Last Month",
+			"trend": 15,
+			"trendtip": "Average Daily Cost",
 			"items": [
-                { "title": "Total sales", "value": "21" },
-                { "title": "Total revenue", "value": "$3,750" }
+                { "title": "Daily", "value": "$125" },
+                { "title": "Total", "value": "$3,750" }
+            ]
+		},
+		{
+			"name": "sales",
+			"graph": "sales",
+			"color": "pink",
+			"title": "Sales",
+			"subtitle": "Compared with Last Month",
+			"trend": 3,
+			"trendtip": "Average Revenue per Sale",
+			"items": [
+                { "title": "Avg. Rev", "value": "$179" },
+                { "title": "Total", "value": "21" }
             ]
 		},
 		{
 			"name": "performance",
-			"graph": "sales",
+			"graph": "cost",
 			"color": "orange",
-			"title": "Overall performance",
-			"subtitle": "Latest 30 Sept, 11:59",
-			"trend": 150,
+			"title": "Performance",
+			"subtitle": "Compared with Last Month",
+			"trend": -5,
+			"trendtip": "Return on Adspend",
 			"items": [
-                { "title": "Rev over Cost", "value": "10%" },
-                { "title": "Cost per Sale", "value": "$16" }
+                { "title": "Return", "value": "10.7X" },
+                { "title": "Total cost", "value": "$350" }
             ]
 		}
 	],

@@ -1,4 +1,7 @@
 ﻿<link rel="import" href="../lib/polymer/polymer.html">
+<link rel="import" href="../lib/iron-icon/iron-icon.html">
+<link rel="import" href="../lib/iron-icons/iron-icons.html">
+<link rel="import" href="../lib/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../lib/granite-c3/granite-c3-polymer.1.x.html">
 
 <dom-module id="dashboard-stats-card">
@@ -14,6 +17,7 @@
                 letter-spacing: .1px;
                 --stat-card-background-color-0: var(--stat-card-background-color, #42A5F5);
                 --stats-card-chart-height-0: var(--stats-card-chart-height, 60px);
+                cursor: default;
             }
             .h4, h4 {
                 font-size: 17px;
@@ -116,6 +120,9 @@
                 left: 0;
                 right: 0;
             }
+            .ontop {
+                z-index: 1000;
+            }
         </style>
         <!-- 
             icons:trending-up
@@ -124,7 +131,10 @@
             icons:star-border
         -->
         <div class="body">
-            <template is="dom-if" if="[[_hasTrend(trend)]]"><div class="pull-right"><iron-icon class="trending" icon="[[_trendIcon]]"></iron-icon>[[trend]]%</div></template>
+            <template is="dom-if" if="[[_hasTrend(trend)]]">
+                <div id="trend" class="pull-right"><iron-icon class="trending" icon="[[_trendIcon]]"></iron-icon>[[trend]]%</div>
+                <paper-tooltip for="trend" offset="0" position="left">[[trendtip]]</paper-tooltip>
+            </template>
             <div><h4 class="no-margin w600 white-text">[[title]]</h4></div>
             <div class="f11" style="opacity: 0.8;">
                 <iron-icon icon="icons:star-border"></iron-icon>
@@ -179,7 +189,29 @@
                 show: false
             },
             tooltip: {
+                grouped: true,
+                /*position: function (data, width, height, element) {
+                    // console.log({data,width,height,element});
+                    var chartElement = document.querySelector("#chart");
+                    var chartOffsetX = chartElement.getBoundingClientRect().left;
+                    var chartOffsetY = chartElement.getBoundingClientRect().top;
+                    var graphOffsetX = document.querySelector("#chart g.c3-axis-y").getBoundingClientRect().right;
+                    var tooltipWidth = document.getElementById('tooltip').parentNode.clientWidth;
+                    var tooltipHeight = document.getElementById('tooltip').parentNode.clientHeight;
+                    var x = (parseInt(element.getAttribute('cx')) ) + graphOffsetX - chartOffsetX - Math.floor(tooltipWidth/2);
+                    if (x < chartOffsetX) x = 0;
+                    var y = element.getAttribute('cy');
+                    var y = y - height;
+                    return {top: y, left: x};
+                },
+                contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+                    d = Math.floor(d[0].value);
+                    return `<div id="tooltip" class="module-triangle-bottom">${d}wows</div>`;
+                }*/
                 format: {
+                    content: function() {
+                        return '';
+                    },
                     title: function (d) { return new moment(d).format('MMM Do'); },
                     value: function (value, ratio, id) {
                         var formatString = ',';
@@ -218,6 +250,9 @@
                 trend: {
                     type: Number,
                     value: undefined
+                },
+                trendtip: {
+                    type: String
                 },
                 _trendIcon: {
                     type: String,

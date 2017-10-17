@@ -16,15 +16,24 @@
     "assets/**/*",
     "images/**/*",
     "data/**/*",
-    "bower.json"
-   ],
-   "extraDependencies": [
-    "manifest.json",
+    "elements/address-form.html",
+    "elements/dashboard-stats-card.html",
+    "node_modules/redux/dist/redux.js",
+    "node_modules/redux-thunk/dist/redux-thunk.js",
+    "lib/lodash/lodash.js",
     "lib/webcomponentsjs/webcomponents-lite.min.js",
-    "lib/lodash/lodash.js"
+    "bower.json"
+  ],
+  "extraDependencies": [
+    "manifest.json"
   ],
   "lint": {
-    "rules": ["polymer-2-hybrid"]
+    "rules": ["polymer-2-hybrid"],
+    "ignoreWarnings": [
+      "multiple-doc-comments",
+      "unknown-polymer-behavior",
+      "overriding-private"
+    ]
   },
   "builds": [
     { "preset": "es5-bundled" },

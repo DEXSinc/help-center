@@ -39,7 +39,8 @@
     "nvd3-elements": "^0.21.0",
     "vaadin-grid": "3.0.0",
     "granite-c3": "LostInBrittany/granite-c3#^2.1.1",
-    "toggle-icon": "1.1.2"
+    "toggle-icon": "1.1.2",
+    "paper-tooltip": "PolymerElements/paper-tooltip#1"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
