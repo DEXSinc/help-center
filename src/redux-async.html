@@ -22,25 +22,6 @@
                         dispatch({ type: 'SIGN_UP_COMPLETED', username: username });
                     }, 3000);
                 }
-            },
-            getDynamoData: function(path) {
-                return function(dispatch) {
-                    var callback = function(data) {
-                        // console.log(data);
-                        dispatch({ type: 'DYNAMO_DATA_CHANGED', path: path, data: data });
-                    }
-                    var callback2 = function(data) {
-                        // console.log(data);
-                        dispatch({ type: 'DYNAMO_INVENTORY_CHANGED', inventory: data })
-                    }
-                    var callback3 = function(data) {
-                        // console.log(data);
-                        dispatch({ type: 'DYNAMO_SERIES_DATA_CHANGED', data: data })
-                    }
-                    getData('data/dynamo/data0.json', null, callback);
-                    getData('data/dynamo/inventory0.json', null, callback2);
-                    getData('data/dynamo/data1.json', null, callback3);
-                }
             }
         }
     };

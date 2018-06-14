@@ -1,4 +1,5 @@
 <link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../redux-store.html">
 
 <dom-module id="app-home">
 
@@ -196,10 +197,26 @@
       paper-dialog-scrollable #scrollable {
         max-height: 100%;
       }
+
+      @media only screen and (max-width: 800px) {
+        paper-search-input {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          z-index: 1;
+        }
+        .knowledge-panel {
+          width: 100%;
+          min-width: 0;
+        }
+        .panelcard {
+          margin-bottom: 80px;
+        }
+      }
     </style>
 
     <iron-ajax id="videoSearchFeed"
-              url="{{serviceUrl}}/api/v1/articles/search"
+              url="[[serviceApiRoot]]/articles/search"
               method="GET"
               params="[[_getParams(searchValue,4)]]"
               last-response="{{videoSearchResult}}"
@@ -207,7 +224,7 @@
               on-request="_clearVideos"
               on-response="_onVideoSearchResult"></iron-ajax>
     <iron-ajax id="articleSearchFeed"
-              url="{{serviceUrl}}/api/v1/articles/search"
+              url="[[serviceApiRoot]]/articles/search"
               method="GET"
               params="[[_getParams(searchValue,0)]]"
               last-response="{{articleResult}}"
@@ -215,7 +232,7 @@
               on-request="_clearArticles"
               on-response="_onArticleSearchResult"></iron-ajax>
     <iron-ajax id="faqSearchFeed"
-              url="{{serviceUrl}}/api/v1/articles/search"
+              url="[[serviceApiRoot]]/articles/search"
               method="GET"
               params="[[_getParams(searchValue,2)]]"
               last-response="{{faqResult}}"
@@ -223,7 +240,7 @@
               on-request="_clearFaqs"
               on-response="_onFaqSearchResult"></iron-ajax>
     <iron-ajax id="articleService"
-              url="{{serviceUrl}}/api/v1/articles/{{articleNumber}}"
+              url="[[serviceApiRoot]]/articles/{{articleNumber}}"
               method="GET"
               last-response="{{currentArticle}}"
               loading="{{articleLoading}}"
@@ -251,7 +268,9 @@
                 text="{{terminalTextItems}}" 
                 value="{{terminalOutput}}"></terminal-text>
             </paper-search-input>
-            <p class="knowledge-caption">The help center gives you quick access to settings and tools that let you review your data, protect your privacy, and decide how your information can make Acquisio services work better for you.</p>
+            <p class="knowledge-caption">
+              Welcome to Acquisio Help Center, your source for getting started, fast-tracking your way to expert-user status, and everything else we think might help you along the way. Check out our FAQs and video library for the most common questions/how-to’s, or simply “search” to find what you’re looking for.
+            </p>
           </div>
         </div>
 
@@ -404,10 +423,11 @@
     Polymer({
 
       is: 'app-home',
+      behaviors: [ReduxBehavior],
       properties: {
-        serviceUrl: {
+        serviceApiRoot: {
           type: String,
-          value: 'https://localhost.acquisio.com'
+          statePath: 'servicesApiRoot'
         },
         hideIcons: {
           type: Boolean,

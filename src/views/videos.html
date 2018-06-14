@@ -1,4 +1,5 @@
 <link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../redux-store.html">
 
 <dom-module id="app-videos">
 
@@ -12,11 +13,12 @@
       .card {
         box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
         padding: 16px;
-        margin: 24px;
         /*border-radius: 5px;*/
         background-color: #fff;
         color: #757575;
         min-height: calc(90vh - 100px);
+        max-width: 900px;
+        margin: 24px auto;
       }
 
       .title {
@@ -129,7 +131,7 @@
 
     <iron-ajax id="essentialsVideos"
               method="GET"
-              url="[[servicesApiRoot]]/api/v1/videos?category=essentials"
+              url="[[servicesApiRoot]]/videos?category=acquisio_essentials"
               last-response="{{essentialsVideos}}"
               withCredentials
               handle-as="json"
@@ -139,13 +141,23 @@
 
     <iron-ajax id="fundamentialsVideos"
               method="GET"
-              url="[[servicesApiRoot]]/api/v1/videos?category=fundamentals"
+              url="[[servicesApiRoot]]/videos?category=fundamentals_videos"
               last-response="{{allFundamentalsVideos}}"
               withCredentials
               handle-as="json"
               auto
               loading="{{videosLoading}}"
               on-response="loadedFundamentals"
+              content-type="application/json"></iron-ajax>
+
+    <iron-ajax id="welcomeToAcquisioVideos"
+              method="GET"
+              url="[[servicesApiRoot]]/videos?category=welcome_to_acquisio"
+              last-response="{{welcomeToAcquisioVideos}}"
+              withCredentials
+              handle-as="json"
+              auto
+              on-response="loadedWelcomeToAcquisioVideos"
               content-type="application/json"></iron-ajax>
 
     <iron-media-query query="(min-width: 600px)" query-matches="{{wide}}"></iron-media-query>
@@ -157,18 +169,26 @@
     <div class="card layout vertical item" wide-layout$="{{wide}}">
       <div class="title self-center">{{title}}</div>
         <div class="video-section">
+          <div class="video-section-title">Welcome to Acquisio</div>
+          <div class="icon-row layout horizontal wrap start-justified">
+            <template is="dom-repeat" items="[[welcomeToAcquisioVideos]]">
+              <wistia-video size="[[getVideoSize(wide, largeVideos)]]" id$="[[item.videoId]]" video-id="[[item.videoId]]"></wistia-video>
+            </template>
+          </div>
+        </div>
+        <div class="video-section">
           <div class="video-section-title">Acquisio Essentials</div>
           <div class="icon-row layout horizontal wrap start-justified">
-              <template is="dom-repeat" items="[[essentialsVideos]]">
-                  <wistia-video size="[[getVideoSize(wide)]]" id$="[[item.videoId]]" video-id="[[item.videoId]]"></wistia-video>
-              </template>
+            <template is="dom-repeat" items="[[essentialsVideos]]">
+              <wistia-video size="[[getVideoSize(wide, normalVideos)]]" id$="[[item.videoId]]" video-id="[[item.videoId]]"></wistia-video>
+            </template>
           </div>
         </div>
         <div class="video-section">
           <div class="video-section-title">Acquisio Fundamentals</div>
           <div class="icon-row layout horizontal wrap start-justified">
               <template is="dom-repeat" items="[[getFundamentalVideos(allFundamentalsVideos, maxFundamentalsVideos)]]">
-                  <wistia-video size="[[getVideoSize(wide)]]" id$="[[item.videoId]]" video-id="[[item.videoId]]"></wistia-video>
+                  <wistia-video size="[[getVideoSize(wide, normalVideos)]]" id$="[[item.videoId]]" video-id="[[item.videoId]]"></wistia-video>
               </template>
               <div class="more-button" hidden$="[[!_hasMoreVideos(maxFundamentalsVideos,allFundamentalsVideos)]]"><paper-button on-tap="addMoreFundamentalsVideos">More</paper-button></div>
           </div>
@@ -182,6 +202,7 @@
     Polymer({
 
       is: 'app-videos',
+      behaviors: [ReduxBehavior],
       properties: {
         title: {
           type: String,
@@ -206,7 +227,7 @@
         },
         servicesApiRoot: {
           type: String,
-          value: 'https://localhost.acquisio.com'
+          statePath: 'servicesApiRoot'
         },
         allFundamentalsVideos: {
           type: Array,
@@ -240,13 +261,24 @@
         maxFundamentalsVideos: {
           type: Number,
           value: 7
+        },
+        normalVideos: {
+          type: Boolean,
+          value: false
+        },
+        largeVideos: {
+          type: Boolean,
+          value: true
         }
       },
       _hasMoreVideos: function(size,videos) {
         return videos.length >= size;
       },
-      getVideoSize: function(size) {
-        return size ? "normal" : "small";
+      getVideoSize: function(wide, big) {
+        if (wide && big) return 'large';
+        if (!wide && !big) return 'small';
+        return 'normal';
+        // return isWide ? "normal" : "small";
       },
       _routeDataChanged: function(n,o) {
         // do something when the routeData has changed
@@ -259,6 +291,8 @@
       },
       loadedFundamentals: function() {
         this.fundamentialsVideos = this.allFundamentalsVideos.slice(0, this.maxFundamentalsVideos);
+      },
+      loadedWelcomeToAcquisioVideos: function() {
       }
 
     });

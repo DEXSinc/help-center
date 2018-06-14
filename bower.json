@@ -23,7 +23,7 @@
     "paper-search-input": "^1.0.7",
     "cc-form": "^1.0.12",
     "terminal-text": "^1.0.9",
-    "wistia-video": "wistia-video#v2.0.0-beta.1",
+    "wistia-video": "wistia-video#master",
     "faq-item": "vic10us/faq-item#master",
     "paper-listbox": "^1.1.2",
     "marked-element": "^1.2.0",
@@ -40,7 +40,8 @@
     "vaadin-grid": "3.0.0",
     "granite-c3": "LostInBrittany/granite-c3#^2.1.1",
     "toggle-icon": "1.1.2",
-    "paper-tooltip": "PolymerElements/paper-tooltip#1"
+    "paper-tooltip": "PolymerElements/paper-tooltip#1",
+    "paper-dialog": "PolymerElements/paper-dialog#1.0.3"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
@@ -53,6 +54,7 @@
     "iron-scroll-target-behavior": "^1.1.0",
     "iron-a11y-keys-behavior": "1 - 2",
     "webcomponentsjs": "^0.7.24",
-    "iron-a11y-announcer": "1 - 2"
+    "iron-a11y-announcer": "1 - 2",
+    "paper-dialog": "1 - 2"
   }
 }
