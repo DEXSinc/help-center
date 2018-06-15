@@ -1,26 +1,20 @@
-<link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../../lib/polymer/polymer-element.html">
+<link rel="import" href="../../lib/wistia-video/wistia-video.html">
+<link rel="import" href="../../lib/app-route/app-route.html">
+<link rel="import" href="../../lib/iron-media-query/iron-media-query.html">
+<link rel="import" href="../../lib/paper-spinner/paper-spinner.html">
 <link rel="import" href="../redux-store.html">
+<link rel="import" href="../shared-styles.html">
 
 <dom-module id="app-videos">
 
   <template>
 
-    <style include="iron-flex iron-flex-alignment">
+    <style include="shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
         padding: 10px;
       }
-      .card {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-        padding: 16px;
-        /*border-radius: 5px;*/
-        background-color: #fff;
-        color: #757575;
-        min-height: calc(90vh - 100px);
-        max-width: 900px;
-        margin: 24px auto;
-      }
-
       .title {
         @apply --paper-font-display1;
         @apply --self-center;
@@ -107,15 +101,6 @@
           margin: 0;
           padding: 0;
         }
-        .card {
-          box-shadow: none;
-          padding: 10px;
-          margin: 0;
-          border-radius: 0;
-          background-color: #fff;
-          color: #757575;
-          min-height: calc(100vh - 84px);
-        }
         .video-section {
           margin: -10px;
         }
@@ -199,103 +184,91 @@
 
   <script>
 
-    Polymer({
+    class AppVideos extends ReduxBehavior(Polymer.Element) {
 
-      is: 'app-videos',
-      behaviors: [ReduxBehavior],
-      properties: {
-        title: {
-          type: String,
-          value: 'Video Library'
-        },
-        sections: {
-          type: Array,
-          value: function() {
-            return [ 
-              {
-                title: 'Acquisio Essentials',
-                key: 'acquisio_essentials',
-                videos: []
-              },
-              {
-                title: 'Acquisio Fundamentals',
-                key: 'fundamentals_videos',
-                videos: []
-              }
-            ];
-          }
-        },
-        servicesApiRoot: {
-          type: String,
-          statePath: 'servicesApiRoot'
-        },
-        allFundamentalsVideos: {
-          type: Array,
-          value: function() {
-            return [];
-          }
-        },
-        fundamentalsVideos: {
-          type: Array,
-          value: function() {
-            return [];
-          }
-        },
-        essentialsVideos: {
-          type: Array,
-          value: function() {
-            return [];
-          }
-        },
-        routeData: {
-          type: Object,
-          value: function() {
-            return {};
+      static get is() { return 'app-videos'; }
+      static get properties() { 
+        return {
+          title: {
+            type: String,
+            value: 'Video Library'
           },
-          observer: '_routeDataChanged'
-        },
-        videosLoading: {
-          type: Boolean,
-          value: true
-        },
-        maxFundamentalsVideos: {
-          type: Number,
-          value: 7
-        },
-        normalVideos: {
-          type: Boolean,
-          value: false
-        },
-        largeVideos: {
-          type: Boolean,
-          value: true
-        }
-      },
-      _hasMoreVideos: function(size,videos) {
+          servicesApiRoot: {
+            type: String,
+            statePath: 'servicesApiRoot'
+          },
+          allFundamentalsVideos: {
+            type: Array,
+            value: function() {
+              return [];
+            }
+          },
+          fundamentalsVideos: {
+            type: Array,
+            value: function() {
+              return [];
+            }
+          },
+          essentialsVideos: {
+            type: Array,
+            value: function() {
+              return [];
+            }
+          },
+          subRoute: {
+            type: Object
+          },
+          routeData: {
+            type: Object,
+            value: function() {
+              return {};
+            },
+            observer: '_routeDataChanged'
+          },
+          videosLoading: {
+            type: Boolean,
+            value: true
+          },
+          maxFundamentalsVideos: {
+            type: Number,
+            value: 7
+          },
+          normalVideos: {
+            type: Boolean,
+            value: false
+          },
+          largeVideos: {
+            type: Boolean,
+            value: true
+          }
+        };
+      }
+      _hasMoreVideos(size,videos) {
         return videos.length >= size;
-      },
-      getVideoSize: function(wide, big) {
+      }
+      getVideoSize(wide, big) {
         if (wide && big) return 'large';
         if (!wide && !big) return 'small';
         return 'normal';
         // return isWide ? "normal" : "small";
-      },
-      _routeDataChanged: function(n,o) {
+      }
+      _routeDataChanged(n,o) {
         // do something when the routeData has changed
-      },
-      addMoreFundamentalsVideos: function() {
+      }
+      addMoreFundamentalsVideos() {
         this.maxFundamentalsVideos += 8;
-      },
-      getFundamentalVideos: function (v, c) {
+      }
+      getFundamentalVideos(v, c) {
         return v.slice(0, c);
-      },
-      loadedFundamentals: function() {
+      }
+      loadedFundamentals() {
         this.fundamentialsVideos = this.allFundamentalsVideos.slice(0, this.maxFundamentalsVideos);
-      },
-      loadedWelcomeToAcquisioVideos: function() {
+      }
+      loadedWelcomeToAcquisioVideos() {
       }
 
-    });
+    }
+    customElements.define(AppVideos.is, AppVideos);
 
   </script>
 

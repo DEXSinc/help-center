@@ -4,46 +4,28 @@
 <link rel="import" href="../../lib/iron-media-query/iron-media-query.html">
 <link rel="import" href="../../lib/paper-spinner/paper-spinner.html">
 <link rel="import" href="../../lib/paper-card/paper-card.html">
-<link rel="import" href="../../lib/iron-list/iron-list.html">
-<link rel="import" href="../../lib/faq-item/faq-item.html">
+<link rel="import" href="../elements/faq-item.html">
 <link rel="import" href="../../lib/marked-element/marked-element.html">
+<link rel="import" href="../shared-styles.html">
 
 <dom-module id="app-faqs">
 
   <template>
 
-    <style is="custom-style" include="paper-item-shared-styles iron-flex iron-flex-alignment">
+    <style include="shared-styles paper-item-shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
-        padding: 10px;
-      }
-      .card {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-        padding: 16px;
-        margin: 24px;
-        border-radius: 5px;
-        background-color: #fff;
-        color: #757575;
-        min-height: calc(90vh - 100px);
-        max-width: 900px;
-        margin: 24px auto;
-      }
-      .circle {
-        display: inline-block;
-        height: 64px;
-        width: 64px;
-        border-radius: 50%;
-        background: #ddd;
-        line-height: 64px;
-        font-size: 30px;
-        color: #555;
-        text-align: center;
+        padding: 0;
       }
 
       h1 {
         font-size: 22px;
         margin: 16px 0;
         color: #212121;
+      }
+
+      .faq-list-items {
+        overflow: auto;
       }
 
       faq-item {
@@ -59,9 +41,9 @@
           };
       }
 
-      faq-item * img {
-          width: 16px;
-          height: 16px;
+      [slot="markdown-html"] * img {
+        max-width: calc(100%);
+        height: auto;
       }
 
       .videos-list {
@@ -183,16 +165,18 @@
                     <paper-card class$="faq-group-[[index]]" elevation="[[_getElevation(queryMatches)]]">
                         <div class="layout vertical">
                             <div class="box-title">[[faqGroup.category]]</div>
-                            <div style="height: 320px; padding-top: 10px; margin: 0;">
-                                <iron-list style="height: 100%;" items="[[faqGroup.faQs]]" as="faq">
+                            <div class="faq-list-items" style="height: 320px; padding-top: 10px; margin: 0;">
+                                <dom-repeat style="height: 100%;" items="[[faqGroup.faQs]]" as="faq">
                                     <template>
+                                      <div>
                                         <faq-item question="[[faq.question]]" category="[[faq.category]]" last-modified="[[faq.lastModified]]">
                                             <marked-element markdown="[[faq.answer]]">
-                                                <div class="markdown-html"></div>
+                                              <div slot="markdown-html"></div>
                                             </marked-element>
                                         </faq-item>
+                                      </div>
                                     </template>
-                                </iron-list>
+                                </dom-repeat>
                             </div>
                         </div>
                     </paper-card>
@@ -204,52 +188,72 @@
 
   <script>
 
-    Polymer({
+    class AppFaqs extends ReduxBehavior(Polymer.Element) {
 
-      is: 'app-faqs',
-      properties: {
-        category: {
-          type: String,
-          value: ''
-        },
-        subRoute: {
-          type: Object
-        },
-        articleData: {
-          type: Object
-        },
-        faqsLoading: {
-          type: Boolean,
-          value: false
-        },
-        queryMatches: {
-          type: Boolean,
-          value: false
-        },
-        faqResult: {
-          type: Array,
-          value: function() {
-            return [];
+      static get is() { return 'app-faqs'; }
+
+      static get properties() { 
+        return  {
+          appRoot: {
+            type: String,
+            statePath: 'appRoot'
+          },
+          imagesServiceUrl: {
+            type: String,
+            statePath: 'imagesServiceUrl'
+          },
+          category: {
+            type: String,
+            value: ''
+          },
+          subRoute: {
+            type: Object
+          },
+          faqsLoading: {
+            type: Boolean,
+            value: false
+          },
+          queryMatches: {
+            type: Boolean,
+            value: false
+          },
+          faqResult: {
+            type: Array,
+            value: function() {
+              return [];
+            }
+          },
+          faqs: {
+            type: Array,
+            value: function() {
+              return [];
+            }
           }
         }
-      },
-      observers: [
-        '_articleDataIdChanged(articleData.id)'
-      ],
-      _articleDataIdChanged: function(id) {
-        this.category = id;
-      },
-      _onFaqsResult: function (r) {
-        // console.log(r);
-      },
-      _elevated: function (b) {
+      }
+      _onFaqsResult(r) {
+        console.log('_onFaqsResult', r);
+        if (!!!r.detail || !!!r.detail.response) return;
+        var faqGroups = r.detail.response;
+        faqGroups.forEach(d => { 
+          console.log(d.category);
+          d.faQs = d.faQs.map(f => Object.assign({}, f, {
+            answer: f.answer.replaceAll('~', '#')
+                            .replaceAll('href="/', `href="${this.appRoot}`)
+                            .replaceAll('article\\?id=', 'articles/')
+                            .replaceAll('src="/', `src="${this.imagesServiceUrl}/`)
+          }));
+        })
+      }
+      _elevated(b) {
         return b ? 'elevated' : '';
-      },
-      _getElevation: function (b) {
+      }
+      _getElevation(b) {
         return b ? 1 : 0;
       }
 
-    });
+    }
+    customElements.define(AppFaqs.is, AppFaqs);
 
   </script>
 

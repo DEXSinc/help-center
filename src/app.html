@@ -1,27 +1,53 @@
-<link rel="import" href="../lib/polymer/polymer.html">
-<link rel="import" href="views/articles.html">
-<link rel="import" href="views/faqs.html">
-<link rel="import" href="views/home.html">
-<link rel="import" href="views/videos.html">
-<link rel="import" href="views/view1.html">
-<link rel="import" href="views/view404.html">
+<link rel="import" href="../lib/polymer/polymer-element.html">
+<link rel="import" href="../lib/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../lib/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../lib/app-layout/app-header/app-header.html">
+<link rel="import" href="../lib/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../lib/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../lib/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../lib/app-route/app-location.html">
+<link rel="import" href="../lib/app-route/app-route.html">
+<link rel="import" href="../lib/iron-pages/iron-pages.html">
+<link rel="import" href="../lib/iron-selector/iron-selector.html">
+<link rel="import" href="../lib/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../lib/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../lib/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="icons.html">
+<link rel="import" href="app-icons.html">
+
+<link rel="lazy-import" href="views/articles.html">
+<link rel="lazy-import" href="views/faqs.html">
+<link rel="lazy-import" href="views/home.html">
+<link rel="lazy-import" href="views/videos.html">
+<link rel="lazy-import" href="views/view1.html">
+<link rel="lazy-import" href="views/view404.html">
 <link rel="import" href="redux-store.html">
-<link rel="import" href="elements.html">
+<link rel="import" href="elements/mdi-icons.html">
 
 <dom-module id="my-app">
 
   <template>
 
-    <style is="custom-style">
+    <style>
 
       :host {
         font-family: 'Roboto', 'Noto', sans-serif;
         display: block;
+
+        --acquisio-blue-100: #34b6e4;
+        --acquisio-blue-900: #0c4c8a;
+        --acquisio-orange-100: #fe7701;
+        --acquisio-grey-100: #6a737b;
+        --acquisio-grey-900: #020306; 
+        --app-primary-color: #fff;
+        --app-secondary-color: var(--acquisio-blue-900);
+
         --primary-color: #234A8F; /*#0C4C8A;*/
         --app-primary-color: #234A8F;
-        --app-selected-color: #4A90E2;
-        --app-highlight-color: #EE7000;
-        --app-secondary-color: #56BDEE;
+        --app-selected-color: var(--acquisio-blue-100);
+        --app-highlight-color: var(--acquisio-orange-100);
+        /* --app-secondary-color: #56BDEE; */
         --app-title-color: #424242;
         --app-subtitle-color: #626262;
         --paper-slider-active-color: var(--app-primary-color);
@@ -38,6 +64,31 @@
         --app-box-shadow-1: 0 1px 8px  0 var(--app-box-shadow-color-2), 
                             0 0px 4px  0 var(--app-box-shadow-color-2), 
                             0 0   8px  0 var(--app-box-shadow-color-2);
+      }
+
+      app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+      }
+      app-header {
+        color: #fff;
+        background-color: var(--app-primary-color);
+      }
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+      .drawer-list {
+        margin: 0 20px;
+      }
+      .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        text-decoration: none;
+        color: var(--app-secondary-color);
+        line-height: 40px;
+      }
+      .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
       }
 
       app-header {
@@ -131,7 +182,6 @@
         }
 
       }
-
     </style>
 
     <app-location route="{{route}}" use-hash-as-path$="[[useHashRouting]]"></app-location>
@@ -142,16 +192,16 @@
         tail="{{subroute}}"
         query-params="{{queryParams}}"></app-route>
 
-    <app-drawer-layout fullbleed force-narrow>
+    <app-drawer-layout fullbleed force-narrow narrow="{{narrow}}">
 
       <!-- Drawer content -->
-      <app-drawer id="appDrawer">
+      <app-drawer id="appDrawer" slot="drawer" swipe-open="[[narrow]]">
         <app-toolbar>
-            <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+            <paper-icon-button icon="app-icons:menu" drawer-toggle></paper-icon-button>
             <span class="logo"><img/></span>
         </app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="home" href="[[appRoot]]">Home</a>
+          <a name="home" href="[[appRoot]]">Help Center</a>
           <a name="articles" href="[[appRoot]]articles/000002271">Getting Started</a>
           <a name="faqs" href$="[[appRoot]]faqs/">Frequently Asked Questions</a>
           <a name="videos" href="[[appRoot]]videos/">Video Library</a>
@@ -161,7 +211,7 @@
       <!-- Main content -->
       <app-header-layout has-scrolling-region>
 
-        <app-header fixed condenses reveals effects="waterfall">
+        <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
             <a class="page-logo" href="[[appRoot]]" style="padding: 10px;"><img class="page-logo" /></a>
@@ -188,90 +238,103 @@
 
   <script>
 
-    Polymer({
+    class MyApp extends ReduxBehavior(Polymer.Element) {
+      static get is() { return 'my-app' }
 
-      is: 'my-app',
-      behaviors: [ReduxBehavior],
-      properties: {
-        appRoot: {
-          type: String,
-          statePath: 'appRoot'
-        },
-        page: {
-          type: String,
-          reflectToAttribute: true,
-          observer: '_pageChanged'
-        },
-        routeData: {
-          type: Object
-        },
-        queryParams: {
-          type: Object
-        },
-        pageTitle: {
-          type: String,
-          statePath: 'page.title'
-        },
-        useHashRouting: {
-          type: Boolean,
-          value: false,
-          relectToAttribute: true
-        }
-      },
-
-      observers: [
-        '_routeChanged(routeData)',
-        '_routePageChanged(routeData.page)'
-      ],
-
-      actions: {
-        setRoute: function(data) {
-          return {
-            type: 'ROUTE_CHANGED',
-            data: data
-          };
-        },
-        setAppRoot: function(url) {
-          return {
-            type: 'SET_APP_ROOT',
-            url: url
-          }
-        },
-        setServicesApiRoot: function(url) {
-          return {
-            type: 'SET_SERVICES_API_ROOT',
-            url: url
+      static get properties() {
+        return {
+          appRoot: {
+            type: String,
+            statePath: 'appRoot'
+          },
+          page: {
+            type: String,
+            reflectToAttribute: true,
+            observer: '_pageChanged'
+          },
+          routeData: Object,
+          subRoute: Object,
+          queryParams: Object,
+          pageTitle: {
+            type: String,
+            statePath: 'page.title'
+          },
+          useHashRouting: {
+            type: Boolean,
+            value: false,
+            relectToAttribute: true
           }
         }
-      },
+      }
 
-      ready: function() {
+      static get observers() {
+        return [
+          '_routeChanged(routeData)',
+          '_routePageChanged(routeData.page)'
+        ]
+      }
+
+      static get actions() {
+        return {
+          setRoute: function(data) {
+            return {
+              type: 'ROUTE_CHANGED',
+              data: data
+            };
+          },
+          setAppRoot: function(url) {
+            return {
+              type: 'SET_APP_ROOT',
+              url: url
+            }
+          },
+          setServicesApiRoot: function(url) {
+            return {
+              type: 'SET_SERVICES_API_ROOT',
+              url: url
+            }
+          }
+        }
+      }
+
+      ready() {
+        super.ready();
         var url = (this.useHashRouting) ? '#/' : '/';
         this.dispatch('setAppRoot', url);
-      },
+      }
 
-      _routeChanged: function(data)  {
+      _routeChanged(data)  {
         this.dispatch('setRoute', data);
         this.$.appDrawer.close();
-      },
+      }
 
-      _routePageChanged: function(page) {
-        this.page = page || 'home';
-      },
+      _routePageChanged(page) {
+        if (!page) {
+          this.page = 'home';
+        } else if (['home', 'articles', 'faqs', 'videos'].indexOf(page) !== -1) {
+          this.page = page;
+        } else {
+          this.page = 'view404';
+        }
+        // this.page = page || 'home';
+      }
 
-      _pageChanged: function(page) {
-        // load page import on demand.
+      _pageChanged(page) {
         var resolvedPageUrl = this.resolveUrl('views/' + page + '.html');
-        this.importHref(resolvedPageUrl, null, this._showPage404, true);
-        this.$.appDrawer.close();
-      },
+        Polymer.importHref(
+            resolvedPageUrl,
+            null,
+            this._showPage404.bind(this),
+            true);
+        // this.$.appDrawer.close();
+      }
 
-      _showPage404: function() {
+      _showPage404() {
         this.page = 'view404';
       }
 
-    });
-
+    }
+    customElements.define(MyApp.is, MyApp);
   </script>
 
 </dom-module>

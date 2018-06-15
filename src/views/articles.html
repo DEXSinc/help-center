@@ -4,26 +4,16 @@
 <link rel="import" href="../../lib/iron-media-query/iron-media-query.html">
 <link rel="import" href="../../lib/paper-spinner/paper-spinner.html">
 <link rel="import" href="../redux-store.html">
+<link rel="import" href="../shared-styles.html">
 
 <dom-module id="app-articles">
 
   <template>
 
-    <style include="iron-flex iron-flex-alignment">
+    <style include="shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
         padding: 0;
-      }
-      .card {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-        padding: 16px;
-        margin: 24px;
-        border-radius: 5px;
-        background-color: #fff;
-        color: #757575;
-        min-height: calc(90vh - 100px);
-        max-width: 900px;
-        margin: 24px auto;
       }
       .title {
         @apply --paper-font-title;
@@ -37,16 +27,6 @@
         max-width: 840px;
       }
       @media only screen and (max-width: 900px) {
-        .card {
-          box-shadow: none;
-          padding: 16px;
-          margin: 0;
-          min-height: calc(100vh);
-          border-radius: 0;
-        }
-        .card .title {
-          white-space: normal;
-        }
         .article {
           width: 100%;
         }
@@ -119,73 +99,76 @@
   </template>
 
   <script>
+    class AppArticles extends ReduxBehavior(Polymer.Element) {
 
-    Polymer({
+      static get is() { return 'app-articles' }
 
-      is: 'app-articles',
-      behaviors: [ReduxBehavior],
-      properties: {
-        appRoot: {
-          type: String,
-          statePath: 'appRoot'
-        },
-        imagesServiceUrl: {
-          type: String,
-          statePath: 'imagesServiceUrl'
-        },
-        subRoute: {
-          type: Object,
-          value: function() {
-            return {};
+      static get properties() {
+        return  {
+          appRoot: {
+            type: String,
+            statePath: 'appRoot'
           },
-          observer: '_subRouteChanged'
-        },
-        articleData: {
-          type: Object,
-          value: function() {
-            return {};
+          imagesServiceUrl: {
+            type: String,
+            statePath: 'imagesServiceUrl'
           },
-          observer: '_articleDataChanged'
-        },
-        articleId: {
-          type: String,
-          value: '',
-          reflectToAttribute: true
-        },
-        servicesApiRoot: {
-          type: String,
-          statePath: 'servicesApiRoot'
-        },
-        article: {
-          type: Object,
-          value: function() {
-            return {
-              title: '',
-              article_Text__c: ''
-            };
+          subRoute: {
+            type: Object,
+            value: function() {
+              return {};
+            },
+            observer: '_subRouteChanged'
+          },
+          articleData: {
+            type: Object,
+            value: function() {
+              return {};
+            },
+            observer: '_articleDataChanged'
+          },
+          articleId: {
+            type: String,
+            value: '',
+            reflectToAttribute: true
+          },
+          servicesApiRoot: {
+            type: String,
+            statePath: 'servicesApiRoot'
+          },
+          article: {
+            type: Object,
+            value: function() {
+              return {
+                title: '',
+                article_Text__c: ''
+              };
+            }
+          },
+          articleContent: {
+            type: String,
+            value: ''
+          },
+          articleLoading: {
+            type: Boolean,
+            value: true
+          },
+          isLoading: {
+            type: Boolean,
+            value: true
           }
-        },
-        articleContent: {
-          type: String,
-          value: ''
-        },
-        articleLoading: {
-          type: Boolean,
-          value: true
-        },
-        isLoading: {
-          type: Boolean,
-          value: true
         }
-      },
-      observers: [
-        '_articleDataIdChanged(articleData.id)',
-        '_articleContentChanged(article.article_Text__c)'
-      ],
-      _subRouteChanged: function(n,o) {
+      }
+      static get observers() { 
+        return [
+          '_articleDataIdChanged(articleData.id)',
+          '_articleContentChanged(article.article_Text__c)'
+        ]
+      }
+      _subRouteChanged(n,o) {
         //console.log(n);
-      },
-      _articleContentChanged: function(c) {
+      }
+      _articleContentChanged(c) {
         // console.log('articleContentChanged', c);
         if (!!c == true) {
           this.$.articleContent.innerHTML = c.replaceAll('~', '#')
@@ -195,19 +178,20 @@
         } else {
           this.$.articleContent.innerHTML = '';
         }
-      },
-      _articleDataChanged: function(n,o) {
+      }
+      _articleDataChanged(n,o) {
         //console.log(n);
-      },
-      _articleDataIdChanged: function(n){
+      }
+      _articleDataIdChanged(n){
         // console.log(n);
         this.articleId = n;
-      },
-      _onArticleResult: function(a) {
+      }
+      _onArticleResult(a) {
         //console.log(a);
       }
 
-    });
+    }
+    customElements.define(AppArticles.is, AppArticles);
 
   </script>
 

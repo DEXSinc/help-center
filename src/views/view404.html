@@ -1,4 +1,4 @@
-<link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../../lib/polymer/polymer-element.html">
 <link rel="import" href="../redux-store.html">
 
 <dom-module id="app-view404">
@@ -15,15 +15,17 @@
   </template>
 
   <script>
-    Polymer({
-      is: 'app-view404',
-      behaviors: [ReduxBehavior],
-      properties: {
-        appRoot: {
-          type: String,
-          statePath: 'appRoot'
+    class App404 extends ReduxBehavior(Polymer.Element) {
+      static get is() {return 'app-view404'; }
+      static get properties() {
+        return {
+          appRoot: {
+            type: String,
+            statePath: 'appRoot'
+          }
         }
       }
-    });
+    }
+    customElements.define(App404.is, App404);
   </script>
 </dom-module>
