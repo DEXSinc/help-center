@@ -1,4 +1,8 @@
 <link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../../lib/app-route/app-route.html">
+<link rel="import" href="../../lib/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../lib/iron-media-query/iron-media-query.html">
+<link rel="import" href="../../lib/paper-spinner/paper-spinner.html">
 <link rel="import" href="../redux-store.html">
 
 <dom-module id="app-articles">
@@ -21,14 +25,13 @@
         max-width: 900px;
         margin: 24px auto;
       }
-
       .title {
-        @apply(--paper-font-title);
+        @apply --paper-font-title;
         padding-bottom: 20px;
       }
       .item .article {
         width: 90%;
-        @apply(--paper-font-body2);
+        @apply --paper-font-body2;
       }
       .item[wide-layout] .article {
         max-width: 840px;
@@ -94,7 +97,7 @@
         pattern="/:id"
         data="{{articleData}}">
     </app-route>
-
+    
     <iron-ajax id="articleFeed"
            url="[[servicesApiRoot]]/articles/{{articleId}}"
            method="GET"
@@ -122,6 +125,14 @@
       is: 'app-articles',
       behaviors: [ReduxBehavior],
       properties: {
+        appRoot: {
+          type: String,
+          statePath: 'appRoot'
+        },
+        imagesServiceUrl: {
+          type: String,
+          statePath: 'imagesServiceUrl'
+        },
         subRoute: {
           type: Object,
           value: function() {
@@ -177,7 +188,10 @@
       _articleContentChanged: function(c) {
         console.log('articleContentChanged', c);
         if (!!c == true) {
-          this.$.articleContent.innerHTML = c.replaceAll('~', '#').replaceAll('href="/', 'href="#/');
+          this.$.articleContent.innerHTML = c.replaceAll('~', '#')
+                                             .replaceAll('href="/', `href="${this.appRoot}`)
+                                             .replaceAll('article\\?id=', 'articles/')
+                                             .replaceAll('src="/', `src="${this.imagesServiceUrl}/`);
         } else {
           this.$.articleContent.innerHTML = '';
         }

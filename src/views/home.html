@@ -1,4 +1,16 @@
 <link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../../lib/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../lib/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../lib/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../lib/marked-element/marked-element.html">
+<link rel="import" href="../../lib/iron-pages/iron-pages.html">
+<link rel="import" href="../../lib/paper-search-input/paper-search-input.html">
+<link rel="import" href="../../lib/terminal-text/terminal-text.html">
+<link rel="import" href="../../lib/paper-card/paper-card.html">
+<link rel="import" href="../../lib/wistia-video/wistia-video-list.html">
+<link rel="import" href="../../lib/paper-button/paper-button.html">
+<link rel="import" href="../../lib/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../lib/faq-item/faq-item.html">
 <link rel="import" href="../redux-store.html">
 
 <dom-module id="app-home">
@@ -14,6 +26,9 @@
         @apply --layout-vertical;
         @apply --layout-center;
         padding: 20px;
+      }
+      .clickable {
+        cursor: pointer;
       }
       .card {
         @apply --layout-vertical;
@@ -182,7 +197,7 @@
       wistia-video-list {
           width: 360px;
       }  
-      paper-dialog {
+      /* paper-dialog {
         position: fixed;
         top: 64px;
         left: 0;
@@ -190,13 +205,15 @@
         right: 0;
         margin: 0;
         height: calc(100vh);
+      } */
+
+      /* paper-dialog-scrollable {
+        @apply --layout-flex;
       }
-      paper-dialog-scrollable {
-        height: calc(100% - 128px); /* 128 seemed to account for the header and footer */
-      }
+
       paper-dialog-scrollable #scrollable {
         max-height: 100%;
-      }
+      } */
 
       @media only screen and (max-width: 800px) {
         paper-search-input {
@@ -277,7 +294,7 @@
         <!-- 
           @ Icon Grid
         -->
-        <div class="panelcard layout vertical center" hidden$="[[hideIcons]]">
+        <div class="panelcard layout vertical center" hidden$="[[isSearching(searchValue)]]">
           <div class="layout horizontal center-justified wrap">
 
             <!-- Getting Started -->
@@ -318,9 +335,9 @@
         <!--
           @ Search Results
           -->
-        <div class="panelcard layout vertical center" hidden$="[[hideSearchResults]]">
+        <div class="panelcard layout vertical center" hidden$="[[!isSearching(searchValue)]]">
           <div class="layout horizontal center-justified wrap">
-
+              
                 <div class="videos-list">
                     <paper-card class="first">
                         <div class="layout vertical">
@@ -336,7 +353,7 @@
                         </div>
                     </paper-card>
                 </div>
-
+                
                 <div class="videos-list">
                     <paper-card class="second">
                         <div class="layout vertical">
@@ -345,7 +362,7 @@
                             <div style="padding: 10px;" hidden$="[[isEmpty(faqResult,faqsLoading)]]">
                                 <paper-listbox id="faqListbox" items="[[faqResult]]">
                                     <template is="dom-repeat" items="[[getItems(faqResult,faqLimit)]]">
-                                        <faq-item question="[[item.title]]" category="[[item.category]]" last-modified="[[item.lastModifiedDate]]">
+                                        <faq-item class="clickable" question="[[item.title]]" category="[[item.category]]" last-modified="[[item.lastModifiedDate]]">
                                             <marked-element markdown="[[item.content]]">
                                             </marked-element>
                                         </faq-item>
@@ -371,10 +388,10 @@
                             <div style="padding: 10px;" hidden$="[[isEmpty(articleResult,articlesLoading)]]">
                                 <paper-listbox id="articleListbox" items="[[articleResult]]">
                                     <template is="dom-repeat" items="[[getItems(articleResult,articleLimit)]]">
-                                        <paper-item alt="[[item.Title]]" role="listitem" on-click="openArticle">
+                                        <paper-item role="listitem">
                                             <iron-icon style="padding-right: 16px;" icon="mdi:file-document-box"></iron-icon>
                                             <paper-item-body two-line>
-                                                <div style="white-space: normal;">[[item.title]]</div>
+                                                <div style="white-space: normal;"><a href="[[appRoot]]articles/[[item.articleNumber]]">[[item.title]]</a></div>
                                                 <div secondary>Last Modified: [[formatHuman(item.lastModifiedDate)]]</div>
                                             </paper-item-body>
                                         </paper-item>
@@ -393,8 +410,7 @@
         </div>
       </div>
 
-      <div name="article">
-
+      <!-- <div name="article">
         <h2>{{sanitizedArticle.Title}}</h2>
         <marked-element id="dialogMarkdown" markdown="{{sanitizedArticle.article_Text__c}}">
             <div class="markdown-html"></div>
@@ -402,7 +418,22 @@
         <div class="buttons">
           <paper-button raised on-tap="_closeArticle">Close</paper-button>
         </div>
-      </div>
+      </div> -->
+    <div id="dialogs">
+      <paper-dialog class="fullscreen" id="animated" entry-animation="scale-up-animation" exit-animation="fade-out-animation" not-with-backdrop>
+        <h2>{{sanitizedArticle.title}}</h2>
+        <paper-dialog-scrollable>
+          This is a test text
+            <marked-element id="dialogMarkdown" markdown="{{sanitizedArticle.article_Text__c}}">
+                <div class="markdown-html"></div>
+            </marked-element>
+        </paper-dialog-scrollable>
+        <div class="buttons">
+            <paper-button dialog-dismiss>Close</paper-button>
+        </div>
+      </paper-dialog>
+    </div>
+
     </iron-pages>
 <!--    <paper-dialog always-on-top class="fullscreen" id="animated" entry-animation="scale-up-animation" exit-animation="fade-out-animation">
         <h2>{{sanitizedArticle.Title}}</h2>
@@ -429,6 +460,10 @@
           type: String,
           statePath: 'servicesApiRoot'
         },
+        appRoot: {
+          type: String,
+          statePath: 'appRoot'
+        },
         hideIcons: {
           type: Boolean,
           value: false,
@@ -437,7 +472,10 @@
         hideSearchResults: {
           type: Boolean,
           value: true,
-          notify: true
+          notify: true,
+        },
+        articleNumber: {
+          type: String
         },
         articleLimit: { 
           type: Number,
@@ -506,9 +544,33 @@
           value: '',
           notify: true
         },
+        videoResults: {
+          type: Array,
+          value: []
+        },
+        videoSearchResult: {
+          type: Array,
+          value: []
+        },
         section: {
           type: String,
           value: 'home'
+        },
+        videosLoading: {
+          type: Boolean,
+          value: false
+        },
+        articlesLoading: {
+          type: Boolean,
+          value: false
+        },
+        faqsLoading: {
+          type: Boolean,
+          value: false
+        },
+        articleLoading: {
+          type: Boolean,
+          value: false
         }
       },
       observers: [
@@ -534,7 +596,8 @@
         this._clearAllSearchResults();
       },
       _onSearchValueChanged: function(e) {
-        console.log(e);
+        console.log('Changed: ', e);
+        // TODO: Must work on this.
       },
       _getParams: function(s, i) {
         var o = { 
@@ -582,7 +645,7 @@
         sa.article_Text__c = at;
         this.sanitizedArticle = sa;
         this.$.dialogMarkdown.render();
-        // this.$.animated.open();
+        this.$.animated.open();
       },
       _clearVideos: function() {
         this.set('videoResults', []);
@@ -613,7 +676,7 @@
         console.log(i.model.item);
         this.articleNumber = i.model.item.articleNumber;
         this.$.articleService.generateRequest();
-        this.section = 'article';
+        // this.section = 'article';
       },
       _onVideoSearchResult: function(a, b, c) {
           this.videoResults = _.map(this.videoSearchResult, function(vsr) { return { videoId: vsr.videoId }; });
@@ -631,7 +694,11 @@
         this.section = 'home';
       },
       attach: function() {
-
+        // do nothing for now.
+      },
+      isSearching: function(sv) {
+        if (sv.trim().length > 0) return true;
+        return false;
       },
       ready: function() {
         var app = this;
@@ -649,6 +716,9 @@
             this.searchBoxScale = "100";
           }
         }, 1000);
+        var dialogs = this.$.dialogs;
+        dialogs.remove();
+        document.querySelector('body').appendChild(dialogs);
       }
     });
 

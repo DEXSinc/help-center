@@ -16,6 +16,7 @@
             'videos': 'Video Library',
             'articles': 'Knowledge Articles'
         },
+        imagesServiceUrl: 'https://localhost.acquisio.com',
         servicesApiRoot: 'https://localhost.acquisio.com/api/v1'
     };
 
@@ -31,6 +32,9 @@
             }
             case 'SET_SERVICES_API_ROOT': {
                 return Object.assign({}, state, { servicesApiRoot: action.url });
+            }
+            case 'SET_IMAGES_SERVICE_URL': {
+                return Object.assign({}, state, { imagesServiceUrl: action.url });
             }
             default: 
                 return state;

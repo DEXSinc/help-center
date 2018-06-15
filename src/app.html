@@ -232,7 +232,7 @@
       },
 
       ready: function() {
-        var url = (this.useHashRouting) ? `${Polymer.rootPath}#/` : Polymer.rootPath;
+        var url = (this.useHashRouting) ? '#/' : '/';
         this.dispatch('setAppRoot', url);
       },
 
