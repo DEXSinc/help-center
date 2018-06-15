@@ -1,4 +1,12 @@
 <link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../../lib/app-route/app-route.html">
+<link rel="import" href="../../lib/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../lib/iron-media-query/iron-media-query.html">
+<link rel="import" href="../../lib/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../lib/paper-card/paper-card.html">
+<link rel="import" href="../../lib/iron-list/iron-list.html">
+<link rel="import" href="../../lib/faq-item/faq-item.html">
+<link rel="import" href="../../lib/marked-element/marked-element.html">
 
 <dom-module id="app-faqs">
 
@@ -166,7 +174,7 @@
     <div id="app-spinner" hidden$="{{!faqsLoading}}">
       <paper-spinner class="blue" active></paper-spinner>
     </div>
-
+    
     <div class="card layout vertical center">
         <div class="page-title">Frequently Asked Questions</div>
         <div class="layout horizontal center-justified wrap">
@@ -204,6 +212,12 @@
           type: String,
           value: ''
         },
+        subRoute: {
+          type: Object
+        },
+        articleData: {
+          type: Object
+        },
         faqsLoading: {
           type: Boolean,
           value: false
@@ -226,7 +240,7 @@
         this.category = id;
       },
       _onFaqsResult: function (r) {
-        console.log(r);
+        // console.log(r);
       },
       _elevated: function (b) {
         return b ? 'elevated' : '';

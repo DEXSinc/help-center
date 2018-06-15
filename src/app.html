@@ -1,5 +1,12 @@
-<link rel="import" href="elements.html">
+<link rel="import" href="../lib/polymer/polymer.html">
+<link rel="import" href="views/articles.html">
+<link rel="import" href="views/faqs.html">
+<link rel="import" href="views/home.html">
+<link rel="import" href="views/videos.html">
+<link rel="import" href="views/view1.html">
+<link rel="import" href="views/view404.html">
 <link rel="import" href="redux-store.html">
+<link rel="import" href="elements.html">
 
 <dom-module id="my-app">
 
@@ -15,7 +22,6 @@
         --app-selected-color: #4A90E2;
         --app-highlight-color: #EE7000;
         --app-secondary-color: #56BDEE;
-        /* --app-title-color: #777777; */
         --app-title-color: #424242;
         --app-subtitle-color: #626262;
         --paper-slider-active-color: var(--app-primary-color);
@@ -145,10 +151,10 @@
             <span class="logo"><img/></span>
         </app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="home" href="#/">Home</a>
-          <a name="articles" href="#/articles/000002271">Getting Started</a>
-          <a name="faqs" href="#/faqs/">Frequently Asked Questions</a>
-          <a name="videos" href="#/videos/">Video Library</a>
+          <a name="home" href="[[appRoot]]">Home</a>
+          <a name="articles" href="[[appRoot]]articles/000002271">Getting Started</a>
+          <a name="faqs" href$="[[appRoot]]faqs/">Frequently Asked Questions</a>
+          <a name="videos" href="[[appRoot]]videos/">Video Library</a>
         </iron-selector>
       </app-drawer>
 
@@ -158,11 +164,10 @@
         <app-header fixed condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
-            <a class="page-logo" href="#/" style="padding: 10px;"><img class="page-logo" /></a>
+            <a class="page-logo" href="[[appRoot]]" style="padding: 10px;"><img class="page-logo" /></a>
             <div class="flexchild" title><span class="logo-link"></span><span>[[pageTitle]]</span></div>
             <div class="toolbar-icons">
-              <a name="home" href="#/"><paper-icon-button icon="home"></paper-icon-button></a>
-              <!-- <paper-icon-button icon="search"></paper-icon-button> -->
+              <a name="home" href="[[appRoot]]"><paper-icon-button icon="home"></paper-icon-button></a>
             </div>
           </app-toolbar>
         </app-header>
@@ -171,8 +176,7 @@
           <app-home name="home"></app-home>
           <app-articles name="articles" sub-route="{{subroute}}"></app-articles>
           <app-faqs name="faqs" sub-route="{{subroute}}"></app-faqs>
-          <app-videos name="videos" sub-route="{{subroute}}"></app-videos>
-          <app-view1 id="view1" name="view1" sub-route="{{subroute}}" query-parameters="[[queryParams]]"></app-view1>
+          <app-videos name="videos"></app-videos>
           <app-view404 name="view404"></app-view404>
         </iron-pages>
         
@@ -189,10 +193,20 @@
       is: 'my-app',
       behaviors: [ReduxBehavior],
       properties: {
+        appRoot: {
+          type: String,
+          statePath: 'appRoot'
+        },
         page: {
           type: String,
           reflectToAttribute: true,
           observer: '_pageChanged'
+        },
+        routeData: {
+          type: Object
+        },
+        queryParams: {
+          type: Object
         },
         pageTitle: {
           type: String,

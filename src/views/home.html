@@ -264,8 +264,6 @@
               on-request="_clearArticle"
               on-response="_onLoadArticle"></iron-ajax>
 
-    <iron-pages role="main" selected="[[section]]" attr-for-selected="name">
-
       <div name="home">
         <!-- 
           @ Search Box
@@ -300,9 +298,9 @@
             <!-- Getting Started -->
             <div class="box col-md-4">
               <div class="category">
-                  <a href="#/articles/000002271"><i class="icons-home icons-getting-started"></i></a>
+                  <a href="[[appRoot]]articles/000002271"><i class="icons-home icons-getting-started"></i></a>
                   <div class="titles-home">
-                      <a href="#/articles/000002271">Getting Started</a>
+                      <a href="[[appRoot]]articles/000002271">Getting Started</a>
                       <p>New to Acquisio? Click here for a quick start.</p>
                   </div>
               </div>
@@ -311,9 +309,9 @@
             <!-- FAQ -->
             <div class="box col-md-4">
               <div class="category">
-                  <a href="#/faqs/"><i class="icons-home icons-faq"></i></a>
+                  <a href="[[appRoot]]faqs/"><i class="icons-home icons-faq"></i></a>
                   <div class="titles-home">
-                      <a href="#/faqs/">FAQ</a>
+                      <a href="[[appRoot]]faqs/">FAQ</a>
                       <p>Browse our Frequently Asked Questions.</p>
                   </div>
               </div>
@@ -322,9 +320,9 @@
             <!-- Video Library -->
             <div class="box col-md-4">
               <div class="category">
-                  <a href="#/videos/"><i class="icons-home icons-video-library"></i></a>
+                  <a href="[[appRoot]]videos/"><i class="icons-home icons-video-library"></i></a>
                   <div class="titles-home">
-                      <a href="#/videos/">Video Library</a>
+                      <a href="[[appRoot]]videos/">Video Library</a>
                       <p>Browse and watch our many awesome videos from our library.</p>
                   </div>
               </div>
@@ -410,15 +408,6 @@
         </div>
       </div>
 
-      <!-- <div name="article">
-        <h2>{{sanitizedArticle.Title}}</h2>
-        <marked-element id="dialogMarkdown" markdown="{{sanitizedArticle.article_Text__c}}">
-            <div class="markdown-html"></div>
-        </marked-element>
-        <div class="buttons">
-          <paper-button raised on-tap="_closeArticle">Close</paper-button>
-        </div>
-      </div> -->
     <div id="dialogs">
       <paper-dialog class="fullscreen" id="animated" entry-animation="scale-up-animation" exit-animation="fade-out-animation" not-with-backdrop>
         <h2>{{sanitizedArticle.title}}</h2>
@@ -434,18 +423,6 @@
       </paper-dialog>
     </div>
 
-    </iron-pages>
-<!--    <paper-dialog always-on-top class="fullscreen" id="animated" entry-animation="scale-up-animation" exit-animation="fade-out-animation">
-        <h2>{{sanitizedArticle.Title}}</h2>
-        <paper-dialog-scrollable>
-            <marked-element id="dialogMarkdown" markdown="{{sanitizedArticle.Article_Text__c}}">
-                <div class="markdown-html"></div>
-            </marked-element>
-        </paper-dialog-scrollable>
-        <div class="buttons">
-            <paper-button dialog-dismiss>Close</paper-button>
-        </div>
-    </paper-dialog> -->
 
   </template>
 
@@ -552,10 +529,6 @@
           type: Array,
           value: []
         },
-        section: {
-          type: String,
-          value: 'home'
-        },
         videosLoading: {
           type: Boolean,
           value: false
@@ -578,7 +551,7 @@
       ],
       _searchResultsChanged: function(v,f,a) {
         var total = v.value.length + f.value.length + a.value.length;
-        console.log("Total Search Results: " + total);
+        // console.log("Total Search Results: " + total);
         if (total > 0) {
           this.hideIcons = true;
           this.hideSearchResults = false;
@@ -592,11 +565,11 @@
         return html.replace(patt, '#');
       },
       _clearSearchResults: function(e) {
-        console.log(e);
+        // console.log(e);
         this._clearAllSearchResults();
       },
       _onSearchValueChanged: function(e) {
-        console.log('Changed: ', e);
+        // console.log('Changed: ', e);
         // TODO: Must work on this.
       },
       _getParams: function(s, i) {
@@ -673,7 +646,7 @@
         this.$.articleListbox.selected = -1;
         this.$.faqListbox.selected = -1;
         if (!!!i || !!!i.model || !!!i.model.item) return;
-        console.log(i.model.item);
+        // console.log(i.model.item);
         this.articleNumber = i.model.item.articleNumber;
         this.$.articleService.generateRequest();
         // this.section = 'article';

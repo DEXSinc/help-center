@@ -186,7 +186,7 @@
         //console.log(n);
       },
       _articleContentChanged: function(c) {
-        console.log('articleContentChanged', c);
+        // console.log('articleContentChanged', c);
         if (!!c == true) {
           this.$.articleContent.innerHTML = c.replaceAll('~', '#')
                                              .replaceAll('href="/', `href="${this.appRoot}`)

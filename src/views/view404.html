@@ -1,4 +1,5 @@
 <link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../redux-store.html">
 
 <dom-module id="app-view404">
   <template>
@@ -10,12 +11,19 @@
       }
     </style>
 
-    Oops you hit a 404. <a href="#/">Head back to home.</a>
+    Oops you hit a 404. <a href="[[appRoot]]">Head back to home.</a>
   </template>
 
   <script>
     Polymer({
-      is: 'app-view404'
+      is: 'app-view404',
+      behaviors: [ReduxBehavior],
+      properties: {
+        appRoot: {
+          type: String,
+          statePath: 'appRoot'
+        }
+      }
     });
   </script>
 </dom-module>
