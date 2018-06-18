@@ -1,0 +1,28 @@
+<script>
+    const getData = function(path, params, callback) {
+        var ajax = new XMLHttpRequest();
+        ajax.open("GET", path, true);
+        ajax.send();
+        ajax.onreadystatechange = function() {
+            if (ajax.readyState == 4 && ajax.status == 200) {
+                var data = JSON.parse(ajax.responseText);
+                callback(data);
+            }
+        }
+    };
+    /**
+    * @polymerBehavior AsyncActionsBehavior
+    */
+    AsyncActionsBehavior = {
+        actions: {
+            signUpWithTimeout: function(username) {
+                return function(dispatch) {
+                    dispatch({type: 'SIGN_UP_STARTED'});
+                    setTimeout(function() {
+                        dispatch({ type: 'SIGN_UP_COMPLETED', username: username });
+                    }, 3000);
+                }
+            }
+        }
+    };
+</script>

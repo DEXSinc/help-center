@@ -1,41 +1,27 @@
-<!--
-@license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
 <link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../../lib/app-route/app-route.html">
+<link rel="import" href="../../lib/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../lib/iron-media-query/iron-media-query.html">
+<link rel="import" href="../../lib/paper-spinner/paper-spinner.html">
+<link rel="import" href="../redux-store.html">
+<link rel="import" href="../shared-styles.html">
 
 <dom-module id="app-articles">
 
   <template>
 
-    <style include="iron-flex iron-flex-alignment">
+    <style include="shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
         padding: 0;
       }
-      .card {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-        padding: 16px;
-        margin: 24px;
-        border-radius: 5px;
-        background-color: #fff;
-        color: #757575;
-        min-height: calc(90vh - 100px);
-      }
-
       .title {
-        @apply(--paper-font-title);
+        @apply --paper-font-title;
         padding-bottom: 20px;
       }
       .item .article {
         width: 90%;
-        @apply(--paper-font-body2);
+        @apply --paper-font-body2;
       }
       .item[wide-layout] .article {
         max-width: 840px;
@@ -91,9 +77,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         pattern="/:id"
         data="{{articleData}}">
     </app-route>
-
+    
     <iron-ajax id="articleFeed"
-           url="https://localhost.acquisio.com/services/api/v1/articles/{{articleId}}"
+           url="[[servicesApiRoot]]/articles/{{articleId}}"
            method="GET"
            auto
            last-response="{{article}}"
@@ -107,84 +93,105 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
 
     <div class="card layout vertical item" wide-layout$="{{wide}}">
-      <div class="title self-center" hidden$="{{articleLoading}}">{{article.Title}}</div>
+      <div class="title self-center" hidden$="{{articleLoading}}">{{article.title}}</div>
       <div id="articleContent" hidden$="{{articleLoading}}"></div>
     </div>
   </template>
 
   <script>
+    class AppArticles extends ReduxBehavior(Polymer.Element) {
 
-    Polymer({
+      static get is() { return 'app-articles' }
 
-      is: 'app-articles',
-      properties: {
-        subRoute: {
-          type: Object,
-          value: function() {
-            return {};
+      static get properties() {
+        return  {
+          appRoot: {
+            type: String,
+            statePath: 'appRoot'
           },
-          observer: '_subRouteChanged'
-        },
-        articleData: {
-          type: Object,
-          value: function() {
-            return {};
+          imagesServiceUrl: {
+            type: String,
+            statePath: 'imagesServiceUrl'
           },
-          observer: '_articleDataChanged'
-        },
-        articleId: {
-          type: String,
-          value: '',
-          reflectToAttribute: true
-        },
-        article: {
-          type: Object,
-          value: function() {
-            return {
-              Title: '',
-              Article_Text__c: ''
-            };
+          subRoute: {
+            type: Object,
+            value: function() {
+              return {};
+            },
+            observer: '_subRouteChanged'
+          },
+          articleData: {
+            type: Object,
+            value: function() {
+              return {};
+            },
+            observer: '_articleDataChanged'
+          },
+          articleId: {
+            type: String,
+            value: '',
+            reflectToAttribute: true
+          },
+          servicesApiRoot: {
+            type: String,
+            statePath: 'servicesApiRoot'
+          },
+          article: {
+            type: Object,
+            value: function() {
+              return {
+                title: '',
+                article_Text__c: ''
+              };
+            }
+          },
+          articleContent: {
+            type: String,
+            value: ''
+          },
+          articleLoading: {
+            type: Boolean,
+            value: true
+          },
+          isLoading: {
+            type: Boolean,
+            value: true
           }
-        },
-        articleContent: {
-          type: String,
-          value: ''
-        },
-        articleLoading: {
-          type: Boolean,
-          value: true
-        },
-        isLoading: {
-          type: Boolean,
-          value: true
         }
-      },
-      observers: [
-        '_articleDataIdChanged(articleData.id)',
-        '_articleContentChanged(article.Article_Text__c)'
-      ],
-      _subRouteChanged: function(n,o) {
+      }
+      static get observers() { 
+        return [
+          '_articleDataIdChanged(articleData.id)',
+          '_articleContentChanged(article.article_Text__c)'
+        ]
+      }
+      _subRouteChanged(n,o) {
         //console.log(n);
-      },
-      _articleContentChanged: function(c) {
+      }
+      _articleContentChanged(c) {
+        // console.log('articleContentChanged', c);
         if (!!c == true) {
-          this.$.articleContent.innerHTML = c.replaceAll('~', '#');
+          this.$.articleContent.innerHTML = c.replaceAll('~', '#')
+                                             .replaceAll('href="/', `href="${this.appRoot}`)
+                                             .replaceAll('article\\?id=', 'articles/')
+                                             .replaceAll('src="/', `src="${this.imagesServiceUrl}/`);
         } else {
           this.$.articleContent.innerHTML = '';
         }
-      },
-      _articleDataChanged: function(n,o) {
+      }
+      _articleDataChanged(n,o) {
         //console.log(n);
-      },
-      _articleDataIdChanged: function(n){
+      }
+      _articleDataIdChanged(n){
         // console.log(n);
         this.articleId = n;
-      },
-      _onArticleResult: function(a) {
-        console.log(a);
+      }
+      _onArticleResult(a) {
+        //console.log(a);
       }
 
-    });
+    }
+    customElements.define(AppArticles.is, AppArticles);
 
   </script>
 

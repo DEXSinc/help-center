@@ -1,0 +1,53 @@
+<link rel="import" href="../lib/polymer/polymer.html">
+<link rel="import" href="../lib/polymer-redux/polymer-redux.html" >
+<script src="./environments/environment.js"></script>
+<script>
+    const initialState = {
+        loading: false,
+        appRoot: '',
+        routeData: {},
+        page: {
+            name: 'home',
+            title: 'Helo Center'
+        },
+        pageTitles: {
+            'home': 'Help Center',
+            'faqs': 'Frequently Asked Questions',
+            'videos': 'Video Library',
+            'articles': 'Knowledge Articles'
+        },
+        imagesServiceUrl: environment.staticUrl || 'https://localhost.acquisio.com',
+        servicesApiRoot: environment.apiUrl || 'https://localhost.acquisio.com/api/v1'
+    };
+
+    const reducer = (state, action) => {
+        if (!state) return initialState;
+        switch (action.type) {
+            case 'ROUTE_CHANGED': {
+                var pageTitle = state.pageTitles[action.data.page] || state.pageTitles['home'];
+                return Object.assign({}, state, { routeData: action.data, page: { title: pageTitle, name: action.data.page } });
+            }
+            case 'SET_APP_ROOT': {
+                return Object.assign({}, state, { appRoot: action.url });
+            }
+            case 'SET_SERVICES_API_ROOT': {
+                return Object.assign({}, state, { servicesApiRoot: action.url });
+            }
+            case 'SET_IMAGES_SERVICE_URL': {
+                return Object.assign({}, state, { imagesServiceUrl: action.url });
+            }
+            default: 
+                return state;
+        }
+    };
+
+    const store = Redux.createStore(
+        reducer,
+        Redux.applyMiddleware(ReduxThunk.default)
+    );
+
+    /**
+     * @polymerBehavior ReduxBehavior
+     */
+    const ReduxBehavior = PolymerRedux(store);
+</script>

@@ -1,37 +1,23 @@
-<!--
-@license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
-<link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../../lib/polymer/polymer-element.html">
+<link rel="import" href="../../lib/wistia-video/wistia-video.html">
+<link rel="import" href="../../lib/app-route/app-route.html">
+<link rel="import" href="../../lib/iron-media-query/iron-media-query.html">
+<link rel="import" href="../../lib/paper-spinner/paper-spinner.html">
+<link rel="import" href="../redux-store.html">
+<link rel="import" href="../shared-styles.html">
 
 <dom-module id="app-videos">
 
   <template>
 
-    <style include="iron-flex iron-flex-alignment">
+    <style include="shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
         padding: 10px;
       }
-      .card {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-        padding: 16px;
-        margin: 24px;
-        /*border-radius: 5px;*/
-        background-color: #fff;
-        color: #757575;
-        min-height: calc(90vh - 100px);
-      }
-
       .title {
-        @apply(--paper-font-display1);
-        @apply(--self-center);
+        @apply --paper-font-display1;
+        @apply --self-center;
         padding-bottom: 40px;
       }
 
@@ -80,15 +66,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         border: 1px solid var(--acquisio-grey-100);
       }
       .video-section-title {
-        @apply(--paper-font-title);
-        @apply(--layout-vertical)
-        @apply(--self-center);
+        @apply --paper-font-title;
+        @apply --layout-vertical;
+        @apply --self-center;
         /*width: 100%;*/
       }
       .more-button paper-button {
         --paper-button: {
-            @apply(--layout-vertical);
-            @apply(--layout-center-center);
+            @apply --layout-vertical;
+            @apply --layout-center-center;
         };
         width: 100%;
         height: 100%;
@@ -115,15 +101,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           margin: 0;
           padding: 0;
         }
-        .card {
-          box-shadow: none;
-          padding: 10px;
-          margin: 0;
-          border-radius: 0;
-          background-color: #fff;
-          color: #757575;
-          min-height: calc(100vh - 84px);
-        }
         .video-section {
           margin: -10px;
         }
@@ -139,7 +116,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <iron-ajax id="essentialsVideos"
               method="GET"
-              url="[[servicesApiRoot]]/api/v1/videos/acquisio_essentials"
+              url="[[servicesApiRoot]]/videos?category=acquisio_essentials"
               last-response="{{essentialsVideos}}"
               withCredentials
               handle-as="json"
@@ -149,13 +126,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <iron-ajax id="fundamentialsVideos"
               method="GET"
-              url="[[servicesApiRoot]]/api/v1/videos/fundamentals_videos"
+              url="[[servicesApiRoot]]/videos?category=fundamentals_videos"
               last-response="{{allFundamentalsVideos}}"
               withCredentials
               handle-as="json"
               auto
               loading="{{videosLoading}}"
               on-response="loadedFundamentals"
+              content-type="application/json"></iron-ajax>
+
+    <iron-ajax id="welcomeToAcquisioVideos"
+              method="GET"
+              url="[[servicesApiRoot]]/videos?category=welcome_to_acquisio"
+              last-response="{{welcomeToAcquisioVideos}}"
+              withCredentials
+              handle-as="json"
+              auto
+              on-response="loadedWelcomeToAcquisioVideos"
               content-type="application/json"></iron-ajax>
 
     <iron-media-query query="(min-width: 600px)" query-matches="{{wide}}"></iron-media-query>
@@ -167,18 +154,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div class="card layout vertical item" wide-layout$="{{wide}}">
       <div class="title self-center">{{title}}</div>
         <div class="video-section">
+          <div class="video-section-title">Welcome to Acquisio</div>
+          <div class="icon-row layout horizontal wrap start-justified">
+            <template is="dom-repeat" items="[[welcomeToAcquisioVideos]]">
+              <wistia-video size="[[getVideoSize(wide, largeVideos)]]" id$="[[item.videoId]]" video-id="[[item.videoId]]"></wistia-video>
+            </template>
+          </div>
+        </div>
+        <div class="video-section">
           <div class="video-section-title">Acquisio Essentials</div>
           <div class="icon-row layout horizontal wrap start-justified">
-              <template is="dom-repeat" items="[[essentialsVideos]]">
-                  <wistia-video size="[[getVideoSize(wide)]]" id$="[[item.videoId]]" video-id="[[item.videoId]]"></wistia-video>
-              </template>
+            <template is="dom-repeat" items="[[essentialsVideos]]">
+              <wistia-video size="[[getVideoSize(wide, normalVideos)]]" id$="[[item.videoId]]" video-id="[[item.videoId]]"></wistia-video>
+            </template>
           </div>
         </div>
         <div class="video-section">
           <div class="video-section-title">Acquisio Fundamentals</div>
           <div class="icon-row layout horizontal wrap start-justified">
               <template is="dom-repeat" items="[[getFundamentalVideos(allFundamentalsVideos, maxFundamentalsVideos)]]">
-                  <wistia-video size="[[getVideoSize(wide)]]" id$="[[item.videoId]]" video-id="[[item.videoId]]"></wistia-video>
+                  <wistia-video size="[[getVideoSize(wide, normalVideos)]]" id$="[[item.videoId]]" video-id="[[item.videoId]]"></wistia-video>
               </template>
               <div class="more-button" hidden$="[[!_hasMoreVideos(maxFundamentalsVideos,allFundamentalsVideos)]]"><paper-button on-tap="addMoreFundamentalsVideos">More</paper-button></div>
           </div>
@@ -189,89 +184,91 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <script>
 
-    Polymer({
+    class AppVideos extends ReduxBehavior(Polymer.Element) {
 
-      is: 'app-videos',
-      properties: {
-        title: {
-          type: String,
-          value: 'Video Library'
-        },
-        sections: {
-          type: Array,
-          value: function() {
-            return [ 
-              {
-                title: 'Acquisio Essentials',
-                key: 'acquisio_essentials',
-                videos: []
-              },
-              {
-                title: 'Acquisio Fundamentals',
-                key: 'fundamentals_videos',
-                videos: []
-              }
-            ];
-          }
-        },
-        servicesApiRoot: {
-          type: String,
-          value: 'https://localhost.acquisio.com/portal'
-        },
-        allFundamentalsVideos: {
-          type: Array,
-          value: function() {
-            return [];
-          }
-        },
-        fundamentalsVideos: {
-          type: Array,
-          value: function() {
-            return [];
-          }
-        },
-        essentialsVideos: {
-          type: Array,
-          value: function() {
-            return [];
-          }
-        },
-        routeData: {
-          type: Object,
-          value: function() {
-            return {};
+      static get is() { return 'app-videos'; }
+      static get properties() { 
+        return {
+          title: {
+            type: String,
+            value: 'Video Library'
           },
-          observer: '_routeDataChanged'
-        },
-        videosLoading: {
-          type: Boolean,
-          value: true
-        },
-        maxFundamentalsVideos: {
-          type: Number,
-          value: 7
-        }
-      },
-      _hasMoreVideos: function(size,videos) {
+          servicesApiRoot: {
+            type: String,
+            statePath: 'servicesApiRoot'
+          },
+          allFundamentalsVideos: {
+            type: Array,
+            value: function() {
+              return [];
+            }
+          },
+          fundamentalsVideos: {
+            type: Array,
+            value: function() {
+              return [];
+            }
+          },
+          essentialsVideos: {
+            type: Array,
+            value: function() {
+              return [];
+            }
+          },
+          subRoute: {
+            type: Object
+          },
+          routeData: {
+            type: Object,
+            value: function() {
+              return {};
+            },
+            observer: '_routeDataChanged'
+          },
+          videosLoading: {
+            type: Boolean,
+            value: true
+          },
+          maxFundamentalsVideos: {
+            type: Number,
+            value: 7
+          },
+          normalVideos: {
+            type: Boolean,
+            value: false
+          },
+          largeVideos: {
+            type: Boolean,
+            value: true
+          }
+        };
+      }
+      _hasMoreVideos(size,videos) {
         return videos.length >= size;
-      },
-      getVideoSize: function(size) {
-        return size ? "normal" : "small";
-      },
-      _routeDataChanged: function(n,o) {
+      }
+      getVideoSize(wide, big) {
+        if (wide && big) return 'large';
+        if (!wide && !big) return 'small';
+        return 'normal';
+        // return isWide ? "normal" : "small";
+      }
+      _routeDataChanged(n,o) {
         // do something when the routeData has changed
-      },
-      addMoreFundamentalsVideos: function() {
+      }
+      addMoreFundamentalsVideos() {
         this.maxFundamentalsVideos += 8;
-      },
-      getFundamentalVideos: function (v, c) {
+      }
+      getFundamentalVideos(v, c) {
         return v.slice(0, c);
-      },
-      loadedFundamentals: function() {
+      }
+      loadedFundamentals() {
         this.fundamentialsVideos = this.allFundamentalsVideos.slice(0, this.maxFundamentalsVideos);
       }
+      loadedWelcomeToAcquisioVideos() {
+      }
 
-    });
+    }
+    customElements.define(AppVideos.is, AppVideos);
 
   </script>
 
