@@ -3,4 +3,3 @@ dist
 node_modules
 build
 lib
-elements/vaadin-charts
