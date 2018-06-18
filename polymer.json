@@ -5,6 +5,34 @@
     "src/views/home.html",
     "src/views/articles.html",
     "src/views/faqs.html",
+    "src/views/view404.html",
     "src/views/videos.html"
+  ],
+  "sources": [
+    "src/**/*",
+    "assets/**/*",
+    "images/**/*",
+    "data/**/*",
+    "node_modules/redux/dist/redux.js",
+    "node_modules/redux-thunk/dist/redux-thunk.js",
+    "lib/lodash/lodash.js",
+    "lib/webcomponentsjs/webcomponents-lite.js",
+    "lib/webcomponentsjs/custom-elements-es5-adapter.js",
+    "bower.json"
+  ],
+  "extraDependencies": [
+    "manifest.json"
+  ],
+  "lint": {
+    "rules": ["polymer-2-hybrid"],
+    "ignoreWarnings": [
+      "multiple-doc-comments",
+      "unknown-polymer-behavior",
+      "overriding-private"
+    ]
+  },
+  "builds": [
+    { "preset": "es5-bundled" },
+    { "preset": "es6-unbundled" }
   ]
 }

@@ -1,23 +1,44 @@
 <link rel="import" href="../../lib/polymer/polymer.html">
-<script src="../../lib/particles.js/particles.min.js"></script>
+<link rel="import" href="../../lib/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../lib/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../lib/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../lib/marked-element/marked-element.html">
+<link rel="import" href="../../lib/iron-pages/iron-pages.html">
+<link rel="import" href="../../lib/paper-search-input/paper-search-input.html">
+<link rel="import" href="../../lib/terminal-text/terminal-text.html">
+<link rel="import" href="../../lib/paper-card/paper-card.html">
+<link rel="import" href="../../lib/wistia-video/wistia-video.html">
+<link rel="import" href="../../lib/wistia-video/wistia-video-list.html">
+<link rel="import" href="../../lib/paper-button/paper-button.html">
+<link rel="import" href="../../lib/paper-listbox/paper-listbox.html">
+<link rel="import" href="../elements/faq-item.html">
+<link rel="import" href="../../lib/polymer/lib/utils/async.html">
+<link rel="import" href="../redux-store.html">
+<link rel="import" href="../shared-styles.html">
 
 <dom-module id="app-home">
 
   <template>
     <link href="/images/iconsets/icons.css" rel="stylesheet" />
-    <style include="app-grid-style iron-flex iron-flex-alignment">
+    <style include="shared-styles app-grid-style iron-flex iron-flex-alignment">
       :host {
         display: block;
         padding: 0;
       }
+      html[hidden] {
+        display: none;
+      }
       .panelcard {
-        @apply(--layout-vertical);
-        @apply(--layout-center);
+        @apply --layout-vertical;
+        @apply --layout-center;
         padding: 20px;
       }
-      .card {
-        @apply(--layout-vertical);
-        @apply(--layout-center);
+      .clickable {
+        cursor: pointer;
+      }
+      .main-card {
+        @apply --layout-vertical;
+        @apply --layout-center;
         background: url('/images/Motion_1_Duotone.jpg') no-repeat center center;
         -webkit-background-size: cover;
         -moz-background-size: cover;
@@ -36,16 +57,19 @@
       }
       .knowledge-panel {
         color: #fff;
-        @apply(--layout-self-center);
+        @apply --layout-self-center;
         width: 50%;
         min-width: 550px;
       }
+      .knowledge-panel h1 {
+        color: #fff;
+      }
       .knowledge-caption {
-        @apply(--paper-font-body2);
+        @apply --paper-font-body2;
         padding: 1em 0;
       }
       h1 {
-        @apply(--paper-font-display2);
+        @apply --paper-font-display2;
         /*text-align: center;*/
         width: 100%;
         /*font-size: 22px;
@@ -98,7 +122,7 @@
         transition: width 0.4s, height 0.4s, background-color 0.4s, transform 0.4s;
       }
       .titles-home a {
-        @apply(--paper-font-headline);
+        @apply --paper-font-headline;
         text-decoration: none;
         color: var(--app-secondary-color);
       }
@@ -152,7 +176,7 @@
       }
             
       .box-title {
-          @apply(--paper-font-title);
+          @apply --paper-font-title;
           padding-left: 10px;
           padding-top: 10px;
           padding-bottom: 10px;
@@ -179,14 +203,14 @@
         color: #803C01;
       }
 
-      .box-footer {
-        /*border-top: 1px solid lightgrey;*/
-      }
-
       wistia-video-list {
           width: 360px;
-      }  
-      paper-dialog {
+      }
+      
+      terminal-text {
+        display: inline;
+      }
+      /* paper-dialog {
         position: fixed;
         top: 64px;
         left: 0;
@@ -194,17 +218,39 @@
         right: 0;
         margin: 0;
         height: calc(100vh);
+      } */
+
+      /* paper-dialog-scrollable {
+        @apply --layout-flex;
       }
-      paper-dialog-scrollable {
-        height: calc(100% - 128px); /* 128 seemed to account for the header and footer */
-      }
+
       paper-dialog-scrollable #scrollable {
         max-height: 100%;
+      } */
+
+      @media only screen and (max-width: 800px) {
+        paper-search-input {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          z-index: 1;
+        }
+        .knowledge-panel {
+          width: 100%;
+          min-width: 0;
+        }
+        .panelcard {
+          margin-bottom: 80px;
+        }
+      }
+      [slot="markdown-html"] * img {
+        max-width: calc(100%);
+        height: auto;
       }
     </style>
 
     <iron-ajax id="videoSearchFeed"
-              url="{{serviceUrl}}/services/api/v1/articles/search"
+              url="[[servicesApiRoot]]/articles/search"
               method="GET"
               params="[[_getParams(searchValue,4)]]"
               last-response="{{videoSearchResult}}"
@@ -212,7 +258,7 @@
               on-request="_clearVideos"
               on-response="_onVideoSearchResult"></iron-ajax>
     <iron-ajax id="articleSearchFeed"
-              url="{{serviceUrl}}/services/api/v1/articles/search"
+              url="[[servicesApiRoot]]/articles/search"
               method="GET"
               params="[[_getParams(searchValue,0)]]"
               last-response="{{articleResult}}"
@@ -220,32 +266,30 @@
               on-request="_clearArticles"
               on-response="_onArticleSearchResult"></iron-ajax>
     <iron-ajax id="faqSearchFeed"
-              url="{{serviceUrl}}/services/api/v1/articles/search"
+              url="[[servicesApiRoot]]/articles/search"
               method="GET"
               params="[[_getParams(searchValue,2)]]"
-              last-response="{{faqResult}}"
+              a-last-response="{{faqResult}}"
               loading="{{faqsLoading}}"
               on-request="_clearFaqs"
               on-response="_onFaqSearchResult"></iron-ajax>
     <iron-ajax id="articleService"
-              url="{{serviceUrl}}/services/api/v1/articles/{{articleNumber}}"
+              url="[[servicesApiRoot]]/articles/{{articleNumber}}"
               method="GET"
               last-response="{{currentArticle}}"
               loading="{{articleLoading}}"
               on-request="_clearArticle"
               on-response="_onLoadArticle"></iron-ajax>
 
-    <iron-pages role="main" selected="[[section]]" attr-for-selected="name">
-
       <div name="home">
         <!-- 
           @ Search Box
         -->
-        <div class="card">
+        <div class="main-card">
           <div id="particles-js" style="position: absolute;"></div>
           <div class="knowledge-panel">
             <h1>How can we help you today?</h1>
-            <paper-search-input id="knowledgeSearch" scale="{{searchBoxScale}}" value="{{searchValue}}" on-value-changed="_onSearchValueChanged" on-value-cleared="_clearSearchResults">
+            <paper-search-input id="knowledgeSearch" scale="{{searchBoxScale}}" value="{{searchValue}}" on-paper-search-input-execute="_onPaperSearchInputExecute" on-value-changed="_onSearchValueChanged" on-value-cleared="_clearSearchResults">
               <terminal-text 
                 clear-delay="1000"
                 back-delay="10"
@@ -256,22 +300,25 @@
                 text="{{terminalTextItems}}" 
                 value="{{terminalOutput}}"></terminal-text>
             </paper-search-input>
-            <p class="knowledge-caption">The help center gives you quick access to settings and tools that let you review your data, protect your privacy, and decide how your information can make Acquisio services work better for you.</p>
+            <p class="knowledge-caption">
+              Welcome to Acquisio Help Center, your source for getting started, fast-tracking your way to expert-user status, and everything else we think might help you along the way. Check out our FAQs and video library for the most common questions/how-to’s, or simply “search” to find what you’re looking for.
+            </p>
           </div>
         </div>
 
         <!-- 
           @ Icon Grid
         -->
-        <div class="panelcard layout vertical center" hidden$="[[hideIcons]]">
+        <template is="dom-if" if="[[!isSearching(searchValue)]]">
+        <div class="panelcard layout vertical center" hidden$="[[isSearching(searchValue)]]">
           <div class="layout horizontal center-justified wrap">
 
             <!-- Getting Started -->
             <div class="box col-md-4">
               <div class="category">
-                  <a href="#/articles/000002271"><i class="icons-home icons-getting-started"></i></a>
+                  <a href="[[appRoot]]articles/000002271"><i class="icons-home icons-getting-started"></i></a>
                   <div class="titles-home">
-                      <a href="#/articles/000002271">Getting Started</a>
+                      <a href="[[appRoot]]articles/000002271">Getting Started</a>
                       <p>New to Acquisio? Click here for a quick start.</p>
                   </div>
               </div>
@@ -280,9 +327,9 @@
             <!-- FAQ -->
             <div class="box col-md-4">
               <div class="category">
-                  <a href="#/faqs/"><i class="icons-home icons-faq"></i></a>
+                  <a href="[[appRoot]]faqs/"><i class="icons-home icons-faq"></i></a>
                   <div class="titles-home">
-                      <a href="#/faqs/">FAQ</a>
+                      <a href="[[appRoot]]faqs/">FAQ</a>
                       <p>Browse our Frequently Asked Questions.</p>
                   </div>
               </div>
@@ -291,217 +338,259 @@
             <!-- Video Library -->
             <div class="box col-md-4">
               <div class="category">
-                  <a href="#/videos/"><i class="icons-home icons-video-library"></i></a>
+                  <a href="[[appRoot]]videos/"><i class="icons-home icons-video-library"></i></a>
                   <div class="titles-home">
-                      <a href="#/videos/">Video Library</a>
+                      <a href="[[appRoot]]videos/">Video Library</a>
                       <p>Browse and watch our many awesome videos from our library.</p>
                   </div>
               </div>
             </div>
           </div>
         </div>
+        </template>
 
         <!--
           @ Search Results
           -->
-        <div class="panelcard layout vertical center" hidden$="[[hideSearchResults]]">
-          <div class="layout horizontal center-justified wrap">
-
-                <div class="videos-list">
-                    <paper-card class="first">
-                        <div class="layout vertical">
-                            <div class="box-title fit">Videos</div>
-                            <div style="padding: 10px; color: #6a737b;" hidden$="[[!videosLoading]]">Loading...</div>
-                            <wistia-video-list hidden$="[[videosLoading]]" videos='[[videoResults]]' max-items="4"></wistia-video-list>
-                            <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(videoResults,videosLoading)]]">No videos found</div>
-                            <div class="layout horizontal end-justified">
-                              <div class="box-footer" hidden>
-                                <paper-button raised hidden>More</paper-button>
-                              </div>
-                            </div>
-                        </div>
-                    </paper-card>
-                </div>
-
-                <div class="videos-list">
-                    <paper-card class="second">
-                        <div class="layout vertical">
-                            <div class="box-title">Frequently Asked Questions</div>
-                            <div style="padding: 10px; color: #6a737b;" hidden$="[[!faqsLoading]]">Loading...</div>
-                            <div style="padding: 10px;" hidden$="[[isEmpty(faqResult,faqsLoading)]]">
-                                <paper-listbox id="faqListbox" items="[[faqResult]]">
-                                    <template is="dom-repeat" items="[[getItems(faqResult,faqLimit)]]">
-                                        <faq-item question="[[item.Title]]" category="[[item.Category]]" last-modified="[[item.LastModifiedDate]]">
-                                            <marked-element markdown="[[item.Content]]">
-                                            </marked-element>
-                                        </faq-item>
-                                    </template>
-                                </paper-listbox>
-                            </div>
-                            <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(faqResult,faqsLoading)]]">No FAQs found</div>
-                            <div class="layout horizontal end-justified fit-bottom">
-                                <div class="box-footer">
-                                  <paper-button raised on-click="showLessFaqs" hidden$="[[!showLess(defaultFaqLimit,faqLimit)]]">Less</paper-button>
-                                  <paper-button raised on-click="addMoreFaqs" hidden$="[[!showMore(faqResult,faqLimit)]]">More</paper-button>
+        <template is="dom-if" if="[[isSearching(searchValue)]]">
+          <div class="panelcard layout vertical center" hidden$="[[!isSearching(searchValue)]]">
+            <div class="layout horizontal center-justified wrap">
+                
+                  <div class="videos-list">
+                      <paper-card class="first">
+                          <div class="layout vertical">
+                              <div class="box-title fit">Videos</div>
+                              <div style="padding: 10px; color: #6a737b;" hidden$="[[!videosLoading]]">Loading...</div>
+                              <wistia-video-list hidden$="[[videosLoading]]" videos='[[videoResults]]' max-items="4"></wistia-video-list>
+                              <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(videoResults,videosLoading)]]">No videos found</div>
+                              <div class="layout horizontal end-justified">
+                                <div class="box-footer" hidden>
+                                  <paper-button raised hidden>More</paper-button>
                                 </div>
-                            </div>
-                        </div>
-                    </paper-card>
-                </div>
+                              </div>
+                          </div>
+                      </paper-card>
+                  </div>
+                  
+                  <div class="videos-list">
+                      <paper-card class="second">
+                          <div class="layout vertical">
+                              <div class="box-title">Frequently Asked Questions</div>
+                              <div style="padding: 10px; color: #6a737b;" hidden$="[[!faqsLoading]]">Loading...</div>
+                              <div style="padding: 10px;" hidden$="[[isEmpty(faqResult,faqsLoading)]]">
+                                  <paper-listbox id="faqListbox" items="[[faqResult]]">
+                                      <template is="dom-repeat" items="[[getItems(faqResult,faqLimit)]]">
+                                          <faq-item class="clickable" question="[[item.title]]" category="[[item.category]]" last-modified="[[item.lastModifiedDate]]">
+                                              <marked-element markdown="[[item.content]]">
+                                                  <div slot="markdown-html"></div>
+                                              </marked-element>
+                                          </faq-item>
+                                      </template>
+                                  </paper-listbox>
+                              </div>
+                              <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(faqResult,faqsLoading)]]">No FAQs found</div>
+                              <div class="layout horizontal end-justified fit-bottom">
+                                  <div class="box-footer">
+                                    <paper-button raised on-click="showLessFaqs" hidden$="[[!showLess(defaultFaqLimit,faqLimit)]]">Less</paper-button>
+                                    <paper-button raised on-click="addMoreFaqs" hidden$="[[!showMore(faqResult,faqLimit)]]">More</paper-button>
+                                  </div>
+                              </div>
+                          </div>
+                      </paper-card>
+                  </div>
 
-                <div class="videos-list">
-                    <paper-card class="third">
-                        <div class="layout vertical">
-                            <div class="box-title">Articles</div>
-                            <div style="padding: 10px; color: #6a737b;" hidden$="[[!articlesLoading]]">Loading...</div>
-                            <div style="padding: 10px;" hidden$="[[isEmpty(articleResult,articlesLoading)]]">
-                                <paper-listbox id="articleListbox" items="[[articleResult]]">
-                                    <template is="dom-repeat" items="[[getItems(articleResult,articleLimit)]]">
-                                        <paper-item alt="[[item.Title]]" role="listitem" on-click="openArticle">
-                                            <iron-icon style="padding-right: 16px;" icon="mdi:file-document-box"></iron-icon>
-                                            <paper-item-body two-line>
-                                                <div style="white-space: normal;">[[item.Title]]</div>
-                                                <div secondary>Last Modified: [[formatHuman(item.LastModifiedDate)]]</div>
-                                            </paper-item-body>
-                                        </paper-item>
-                                    </template>
-                                </paper-listbox>
-                            </div>
-                            <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(articleResult,articlesLoading)]]">No articles found</div>
-                            <div class="layout horizontal end-justified">
-                                <paper-button raised on-click="showLessArticles" hidden$="[[!showLess(defaultArticleLimit,articleLimit)]]">Less</paper-button>
-                                <paper-button raised on-click="addMoreArticles" hidden$="[[!showMore(articleResult,articleLimit)]]">More</paper-button>
-                            </div>
-                        </div>
-                    </paper-card>
-                </div>
+                  <div class="videos-list">
+                      <paper-card class="third">
+                          <div class="layout vertical">
+                              <div class="box-title">Articles</div>
+                              <div style="padding: 10px; color: #6a737b;" hidden$="[[!articlesLoading]]">Loading...</div>
+                              <div style="padding: 10px;" hidden$="[[isEmpty(articleResult,articlesLoading)]]">
+                                  <paper-listbox id="articleListbox" items="[[articleResult]]">
+                                      <template is="dom-repeat" items="[[getItems(articleResult,articleLimit)]]">
+                                          <paper-item role="listitem">
+                                              <iron-icon style="padding-right: 16px;" icon="mdi:file-document-box"></iron-icon>
+                                              <paper-item-body two-line>
+                                                  <div style="white-space: normal;"><a href="[[appRoot]]articles/[[item.articleNumber]]">[[item.title]]</a></div>
+                                                  <div secondary>Last Modified: [[formatHuman(item.lastModifiedDate)]]</div>
+                                              </paper-item-body>
+                                          </paper-item>
+                                      </template>
+                                  </paper-listbox>
+                              </div>
+                              <div style="padding: 10px; color: #6a737b;" hidden$="[[!isEmpty(articleResult,articlesLoading)]]">No articles found</div>
+                              <div class="layout horizontal end-justified">
+                                  <paper-button raised on-click="showLessArticles" hidden$="[[!showLess(defaultArticleLimit,articleLimit)]]">Less</paper-button>
+                                  <paper-button raised on-click="addMoreArticles" hidden$="[[!showMore(articleResult,articleLimit)]]">More</paper-button>
+                              </div>
+                          </div>
+                      </paper-card>
+                  </div>
+            </div>
           </div>
-        </div>
+        </template>
       </div>
 
-      <div name="article">
-
-        <h2>{{sanitizedArticle.Title}}</h2>
-        <marked-element id="dialogMarkdown" markdown="{{sanitizedArticle.Article_Text__c}}">
-            <div class="markdown-html"></div>
-        </marked-element>
-        <div class="buttons">
-          <paper-button raised on-tap="_closeArticle">Close</paper-button>
-        </div>
-      </div>
-    </iron-pages>
-<!--    <paper-dialog always-on-top class="fullscreen" id="animated" entry-animation="scale-up-animation" exit-animation="fade-out-animation">
-        <h2>{{sanitizedArticle.Title}}</h2>
+    <div id="dialogs">
+      <paper-dialog class="fullscreen" id="animated" entry-animation="scale-up-animation" exit-animation="fade-out-animation" not-with-backdrop>
+        <h2>{{sanitizedArticle.title}}</h2>
         <paper-dialog-scrollable>
-            <marked-element id="dialogMarkdown" markdown="{{sanitizedArticle.Article_Text__c}}">
+          This is a test text
+            <marked-element id="dialogMarkdown" markdown="{{sanitizedArticle.article_Text__c}}">
                 <div class="markdown-html"></div>
             </marked-element>
         </paper-dialog-scrollable>
         <div class="buttons">
             <paper-button dialog-dismiss>Close</paper-button>
         </div>
-    </paper-dialog> -->
+      </paper-dialog>
+    </div>
+
 
   </template>
 
   <script>
 
-    Polymer({
+    class AppHome extends ReduxBehavior(Polymer.Element) {
 
-      is: 'app-home',
-      properties: {
-        serviceUrl: {
-          type: String,
-          value: 'https://localhost.acquisio.com'
-        },
-        hideIcons: {
-          type: Boolean,
-          value: false,
-          notify: true
-        },
-        hideSearchResults: {
-          type: Boolean,
-          value: true,
-          notify: true
-        },
-        articleLimit: { 
-          type: Number,
-          value: 5
-        },
-        faqLimit: { 
-          type: Number,
-          value: 5
-        },
-        videoLimit: { 
-          type: Number,
-          value: 4
-        },
-        defaultArticleLimit: { 
-          type: Number,
-          value: 5
-        },
-        defaultFaqLimit: { 
-          type: Number,
-          value: 5
-        },
-        defaultVideoLimit: { 
-          type: Number,
-          value: 4
-        },
-        currentArticle: {
-          type: Object,
-          value: function() {
-            return {};
+      static get is() { return 'app-home'; }
+      static get properties() { 
+        return {
+          imagesServiceUrl: {
+            type: String,
+            statePath: 'imagesServiceUrl'
+          },
+          servicesApiRoot: {
+            type: String,
+            statePath: 'servicesApiRoot'
+          },
+          appRoot: {
+            type: String,
+            statePath: 'appRoot'
+          },
+          hideIcons: {
+            type: Boolean,
+            value: false,
+            notify: true
+          },
+          hideSearchResults: {
+            type: Boolean,
+            value: true,
+            notify: true,
+          },
+          articleNumber: {
+            type: String
+          },
+          articleLimit: { 
+            type: Number,
+            value: 5
+          },
+          faqLimit: { 
+            type: Number,
+            value: 5
+          },
+          videoLimit: { 
+            type: Number,
+            value: 4
+          },
+          defaultArticleLimit: { 
+            type: Number,
+            value: 5
+          },
+          defaultFaqLimit: { 
+            type: Number,
+            value: 5
+          },
+          defaultVideoLimit: { 
+            type: Number,
+            value: 4
+          },
+          currentArticle: {
+            type: Object,
+            value: function() {
+              return {};
+            }
+          },
+          sanitizedArticle: {
+            type: Object,
+            value: function() {
+              return {};
+            }
+          },
+          searchValue: {
+            type: String,
+            value: ''
+          },
+          searchBoxScale: {
+            type: String,
+            value: "50",
+            notify: true
+          },
+          terminalTextItems: {
+            type: Array,
+            value: function() {
+              return [
+                'Search^250.^150.^150.^1000',
+                'Link a MCC^1000',
+                'Custom Reporting^1000',
+                'Acquisio Social^1000',
+                'BBM^1000',
+                'Acquisio Turing^1000'
+              ];
+            }
+          },
+          prefixText: {
+            type: String,
+            value: '',
+            notify: true
+          },
+          terminalOutput: {
+            type: String,
+            value: '',
+            notify: true
+          },
+          videoResults: {
+            type: Array,
+            value: []
+          },
+          videoSearchResult: {
+            type: Array,
+            value: []
+          },
+          videosLoading: {
+            type: Boolean,
+            value: false
+          },
+          articlesLoading: {
+            type: Boolean,
+            value: false
+          },
+          faqsLoading: {
+            type: Boolean,
+            value: false
+          },
+          articleLoading: {
+            type: Boolean,
+            value: false
+          },
+          faqResult: {
+            type: Array,
+            value: function() {
+              return [];
+            }
           }
-        },
-        sanitizedArticle: {
-          type: Object,
-          value: function() {
-            return {};
-          }
-        },
-        searchValue: {
-          type: String,
-          value: ''
-        },
-        searchBoxScale: {
-          type: String,
-          value: "50",
-          notify: true
-        },
-        terminalTextItems: {
-          type: Array,
-          value: function() {
-            return [
-              'Search^250.^150.^150.^1000',
-              'Link an MCC^1000',
-              'Custom Reporting^1000',
-              'Acquisio Social^1000',
-              'BBM^1000'
-            ];
-          }
-        },
-        prefixText: {
-          type: String,
-          value: '',
-          notify: true
-        },
-        terminalOutput: {
-          type: String,
-          value: '',
-          notify: true
-        },
-        section: {
-          type: String,
-          value: 'home'
-        }
-      },
-      observers: [
-        '_searchResultsChanged(videoResults.*, faqResult.*, articleResult.*)'
-      ],
-      _searchResultsChanged: function(v,f,a) {
-        var total = v.value.length + f.value.length + a.value.length;
-        console.log("Total Search Results: " + total);
+        };
+      }
+      static get observers() { 
+        return [
+          '_searchResultsChanged(videoResults.*, faqResult.*, articleResult.*)'
+        ]
+      }
+      _searchResultsChanged(v,f,a) {
+        var vv = !!v.value ? v.value.length : 0;
+        var fv = !!f.value ? f.value.length : 0;
+        var av = !!a.value ? a.value.length : 0;
+        var total = vv + fv + av;
+        // console.log("Total Search Results: " + total);
         if (total > 0) {
           this.hideIcons = true;
           this.hideSearchResults = false;
@@ -509,139 +598,152 @@
         }
         this.hideIcons = false;
         this.hideSearchResults = true;
-      },
-      expandPath: function(html) {
+      }
+      expandPath(html) {
         var patt = /~/igm;
         return html.replace(patt, '#');
-      },
-      _clearSearchResults: function(e) {
-        console.log(e);
+      }
+      _clearSearchResults(e) {
+        // console.log(e);
         this._clearAllSearchResults();
-      },
-      _onSearchValueChanged: function(e) {
-        console.log(e);
-      },
-      _getParams: function(s, i) {
+      }
+      _onSearchValueChanged(e) {
+        // console.log('Changed: ', e);
+        // TODO: Must work on this.
+      }
+      _getParams(s, i) {
         var o = { 
           keyword: s,
           type: i 
         };
         return o;
-      },
-      isEmpty: function(arr, loading) {
+      }
+      isEmpty(arr, loading) {
         return !loading && _.isEmpty(arr);
-      },
-      getItems: function(l, c) {
+      }
+      getItems(l, c) {
+        if (l == null || l == undefined || c == null || c == undefined) return [];
         return l.slice(0, c);
-      },
-      addMoreArticles: function() {
+      }
+      addMoreArticles() {
         this.articleLimit += 5;
-      },
-      showLessArticles: function() {
+      }
+      showLessArticles() {
         var x = this.articleLimit - 5;
         this.articleLimit = Math.max(this.defaultArticleLimit, x);
-      },
-      addMoreFaqs: function() {
+      }
+      addMoreFaqs() {
         this.faqLimit += 5;
-      },
-      showLessFaqs: function() {
+      }
+      showLessFaqs() {
         var x = this.faqLimit - 5;
         this.faqLimit = Math.max(this.defaultFaqLimit, x);
-      },
-      showMore: function(l, c) {
+      }
+      showMore(l, c) {
         // list is empty return false
         // list count <= limit return false
         if (!!!l) return false;
         if (l.length <= c) return false;
         return true;
-      },
-      showLess: function(i, c) {
+      }
+      showLess(i, c) {
         // list is empty return false
         // list count <= limit return false
         if (c > i) return true;
         return false;
-      },
-      _onLoadArticle: function() {
+      }
+      _onLoadArticle() {
         var sa = this.currentArticle;
-        var at = this.expandPath(sa.Article_Text__c);
-        sa.Article_Text__c = at;
+        var at = this.expandPath(sa.article_Text__c);
+        sa.article_Text__c = at;
         this.sanitizedArticle = sa;
         this.$.dialogMarkdown.render();
-        // this.$.animated.open();
-      },
-      _clearVideos: function() {
+        this.$.animated.open();
+      }
+      _clearVideos() {
         this.set('videoResults', []);
-      },
-      _clearFaqs: function() {
+      }
+      _clearFaqs() {
         this.set('faqResult', []);
-      },
-      _clearArticle: function() {
-      },
-      _clearArticles: function() {
+      }
+      _clearArticle() {
+      }
+      _clearArticles() {
         this.set('articleResult', []);
-      },
-      _clearAllSearchResults: function() {
+      }
+      _clearAllSearchResults() {
         this._clearVideos();
         this._clearFaqs();
         this._clearArticles();
-      },
-      _onFaqSearchResult: function(a) {
+      }
+      _onFaqSearchResult(r) {
+        console.log('_onFaqsResult', r);
+        if (!!!r.detail || !!!r.detail.response) return;
+        var d = r.detail.response;
+        d = d.map(f => Object.assign({}, f, {
+          content: f.content.replaceAll('~', '#')
+                          .replaceAll('href="/', `href="${this.appRoot}`)
+                          .replaceAll('article\\?id=', 'articles/')
+                          .replaceAll('src="/', `src="${this.imagesServiceUrl}/`)
+        }));
+        this.set('faqResult', d);
         // do something...
-      },
-      _onArticleSearchResult: function(a) {
+      }
+      _onArticleSearchResult(a) {
         // do something...
-      },
-      openArticle: function(i) {
-        this.$.articleListbox.selected = -1;
-        this.$.faqListbox.selected = -1;
-        if (!!!i || !!!i.model || !!!i.model.item) return;
-        console.log(i.model.item);
-        this.articleNumber = i.model.item.ArticleNumber;
-        this.$.articleService.generateRequest();
-        this.section = 'article';
-      },
-      _onVideoSearchResult: function(a, b, c) {
-          this.videoResults = _.map(this.videoSearchResult, function(vsr) { return { videoId: vsr.VideoId }; });
+      }
+      _onVideoSearchResult(a, b, c) {
+          this.videoResults = _.map(this.videoSearchResult, function(vsr) { return { videoId: vsr.videoId }; });
           this.hasVideoResults = this.videoResults.length > 0;
-      },
-      _resetLimits: function() {
+      }
+      _resetLimits() {
         this.articleLimit = this.defaultArticleLimit;
         this.faqLimit = this.defaultFaqLimit;
         this.videoLimit = this.defaultVideoLimit;
-      },
-      formatHuman: function(d) {
+      }
+      formatHuman(d) {
         return moment(d).fromNow();
-      },
-      _closeArticle: function() {
+      }
+      _closeArticle() {
         this.section = 'home';
-      },
-      attach: function() {
-
-      },
-      ready: function() {
+      }
+      isSearching(sv) {
+        if (sv.trim().length > 0) return true;
+        return false;
+      }
+      _onPaperSearchInputExecute(e) {
+        this.$.videoSearchFeed.generateRequest();
+        this.$.faqSearchFeed.generateRequest();
+        this.$.articleSearchFeed.generateRequest();
+        var articleListbox = this.root.querySelector('#articleListbox');
+        var faqListbox = this.root.querySelector('#faqListbox');
+        articleListbox.selected = -1;
+        faqListbox.selected = -1;
+        this._resetLimits();
+      }
+      ready() {
+        super.ready();
         var app = this;
         //this.$.animated.positionTarget = document.querySelector('body');
-        document.addEventListener("paper-search-input-execute", function(e) {
+        /* document.addEventListener("paper-search-input-execute", function(e) {
           app.$.videoSearchFeed.generateRequest();
           app.$.faqSearchFeed.generateRequest();
           app.$.articleSearchFeed.generateRequest();
           app.$.articleListbox.selected = -1;
           app.$.faqListbox.selected = -1;
           app._resetLimits();
-        });
-        this.async(function() {
+        });*/
+        setTimeout(() => {
           if (this.searchBoxScale < 50) {
             this.searchBoxScale = "100";
           }
         }, 1000);
+        var dialogs = this.$.dialogs;
+        dialogs.remove();
+        document.querySelector('body').appendChild(dialogs);
       }
-    });
-
-    /* particlesJS.load(@dom-id, @path-json, @callback (optional)); */
-    particlesJS.load('particles-js', 'assets/particles.json', function() {
-      console.log('callback - particles.js config loaded');
-    });
-
+    }
+    customElements.define(AppHome.is, AppHome);
   </script>
 
 </dom-module>

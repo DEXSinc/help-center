@@ -1,43 +1,21 @@
-<!--
-@license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
 <link rel="import" href="../../lib/polymer/polymer.html">
+<link rel="import" href="../../lib/app-route/app-route.html">
+<link rel="import" href="../../lib/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../lib/iron-media-query/iron-media-query.html">
+<link rel="import" href="../../lib/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../lib/paper-card/paper-card.html">
+<link rel="import" href="../elements/faq-item.html">
+<link rel="import" href="../../lib/marked-element/marked-element.html">
+<link rel="import" href="../shared-styles.html">
 
 <dom-module id="app-faqs">
 
   <template>
 
-    <style is="custom-style" include="paper-item-shared-styles iron-flex iron-flex-alignment">
+    <style include="shared-styles paper-item-shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
-        padding: 10px;
-      }
-      .card {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-        padding: 16px;
-        margin: 24px;
-        border-radius: 5px;
-        background-color: #fff;
-        color: #757575;
-        min-height: calc(90vh - 100px);
-      }
-      .circle {
-        display: inline-block;
-        height: 64px;
-        width: 64px;
-        border-radius: 50%;
-        background: #ddd;
-        line-height: 64px;
-        font-size: 30px;
-        color: #555;
-        text-align: center;
+        padding: 0;
       }
 
       h1 {
@@ -46,22 +24,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #212121;
       }
 
+      .faq-list-items {
+        overflow: auto;
+      }
+
       faq-item {
           --faq-question-item: {
-              @apply(--paper-font-body2);
+              @apply --paper-font-body2;
               cursor: pointer;
           };
 
           --faq-answer-item: {
-              @apply(--paper-font-body1);
+              @apply --paper-font-body1;
               overflow: hidden;
               background-color: white;
           };
       }
 
-      faq-item * img {
-          width: 16px;
-          height: 16px;
+      [slot="markdown-html"] * img {
+        max-width: calc(100%);
+        height: auto;
       }
 
       .videos-list {
@@ -89,7 +71,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .box-title {
-          @apply(--paper-font-title);
+          @apply --paper-font-title;
           margin-left: 10px;
           margin-top: 10px;
           color: #6a737b;
@@ -98,7 +80,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .page-title {
-          @apply(--paper-font-display1);
+          @apply --paper-font-display1;
           padding-top: 32px;
       }
 
@@ -162,7 +144,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         data="{{articleData}}">
     
     <iron-ajax id="faqSearchFeed"
-           url="https://localhost.acquisio.com/services/api/v1/faqs/{{category}}"
+           url="https://localhost.acquisio.com/api/v1/faqs/{{category}}"
            method="GET"
            auto
            last-response="{{faqResult}}"
@@ -174,7 +156,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div id="app-spinner" hidden$="{{!faqsLoading}}">
       <paper-spinner class="blue" active></paper-spinner>
     </div>
-
+    
     <div class="card layout vertical center">
         <div class="page-title">Frequently Asked Questions</div>
         <div class="layout horizontal center-justified wrap">
@@ -182,17 +164,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <div class$="videos-list [[_elevated(queryMatches)]]">
                     <paper-card class$="faq-group-[[index]]" elevation="[[_getElevation(queryMatches)]]">
                         <div class="layout vertical">
-                            <div class="box-title">[[faqGroup.Category]]</div>
-                            <div style="height: 320px; padding-top: 10px; margin: 0;">
-                                <iron-list style="height: 100%;" items="[[faqGroup.FAQs]]" as="faq">
+                            <div class="box-title">[[faqGroup.category]]</div>
+                            <div class="faq-list-items" style="height: 320px; padding-top: 10px; margin: 0;">
+                                <dom-repeat style="height: 100%;" items="[[faqGroup.faQs]]" as="faq">
                                     <template>
-                                        <faq-item question="[[faq.Question]]" category="[[faq.Category]]" last-modified="[[faq.LastModified]]">
-                                            <marked-element markdown="[[faq.Answer]]">
-                                                <div class="markdown-html"></div>
+                                      <div>
+                                        <faq-item question="[[faq.question]]" category="[[faq.category]]" last-modified="[[faq.lastModified]]">
+                                            <marked-element markdown="[[faq.answer]]">
+                                              <div slot="markdown-html"></div>
                                             </marked-element>
                                         </faq-item>
+                                      </div>
                                     </template>
-                                </iron-list>
+                                </dom-repeat>
                             </div>
                         </div>
                     </paper-card>
@@ -204,46 +188,72 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <script>
 
-    Polymer({
+    class AppFaqs extends ReduxBehavior(Polymer.Element) {
 
-      is: 'app-faqs',
-      properties: {
-        category: {
-          type: String,
-          value: ''
-        },
-        faqsLoading: {
-          type: Boolean,
-          value: false
-        },
-        queryMatches: {
-          type: Boolean,
-          value: false
-        },
-        faqResult: {
-          type: Array,
-          value: function() {
-            return [];
+      static get is() { return 'app-faqs'; }
+
+      static get properties() { 
+        return  {
+          appRoot: {
+            type: String,
+            statePath: 'appRoot'
+          },
+          imagesServiceUrl: {
+            type: String,
+            statePath: 'imagesServiceUrl'
+          },
+          category: {
+            type: String,
+            value: ''
+          },
+          subRoute: {
+            type: Object
+          },
+          faqsLoading: {
+            type: Boolean,
+            value: false
+          },
+          queryMatches: {
+            type: Boolean,
+            value: false
+          },
+          faqResult: {
+            type: Array,
+            value: function() {
+              return [];
+            }
+          },
+          faqs: {
+            type: Array,
+            value: function() {
+              return [];
+            }
           }
         }
-      },
-      observers: [
-        '_articleDataIdChanged(articleData.id)'
-      ],
-      _articleDataIdChanged: function(id) {
-        this.category = id;
-      },
-      _onFaqsResult: function (r) {
-        console.log(r);
-      },
-      _elevated: function (b) {
+      }
+      _onFaqsResult(r) {
+        console.log('_onFaqsResult', r);
+        if (!!!r.detail || !!!r.detail.response) return;
+        var faqGroups = r.detail.response;
+        faqGroups.forEach(d => { 
+          console.log(d.category);
+          d.faQs = d.faQs.map(f => Object.assign({}, f, {
+            answer: f.answer.replaceAll('~', '#')
+                            .replaceAll('href="/', `href="${this.appRoot}`)
+                            .replaceAll('article\\?id=', 'articles/')
+                            .replaceAll('src="/', `src="${this.imagesServiceUrl}/`)
+          }));
+        })
+      }
+      _elevated(b) {
         return b ? 'elevated' : '';
-      },
-      _getElevation: function (b) {
+      }
+      _getElevation(b) {
         return b ? 1 : 0;
       }
 
-    });
+    }
+    customElements.define(AppFaqs.is, AppFaqs);
 
   </script>
 

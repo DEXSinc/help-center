@@ -1,0 +1,110 @@
+<link rel="import" href="../../lib/polymer/polymer-element.html">
+<link rel="import" href="../../lib/paper-item/paper-item.html">
+<link rel="import" href="../../lib/paper-item/paper-icon-item.html">
+<link rel="import" href="../../lib/paper-item/paper-item-body.html">
+<link rel="import" href="../../lib/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../lib/iron-icons/iron-icons.html">
+<link rel="import" href="mdi-icons.html">
+
+<script src="../../lib/moment/moment.js"></script>
+
+<dom-module id="faq-item">
+  <template>
+    <!-- <custom-style> -->
+        <style is="custom-style">
+            :host {
+                display: block;
+                --question-background-color0: #fff;
+                --question-expanded-background-color0: #ddd;
+                --faq-border-color0: #34b6e4;
+            }
+            .question-item {
+                @apply --faq-question-item;
+            }
+            .question {
+                white-space: normal;
+            }
+            paper-item.question-item {
+                background-color: var(--question-background-color, var(--question-background-color0));
+            }
+            .answer-item {
+                display: flex;
+                padding: 16px;
+                flex: 1;
+                align-items: center;
+                @apply --faq-answer-item;
+            }
+            .expanded .answer-item {
+                border: 1px dashed var(--faq-border-color, var(--faq-border-color0));
+            }
+            .expanded .question-item {
+                background-color: var(--question-expanded-background-color, var(--question-expanded-background-color0));
+            }
+            iron-icon {
+                padding-right: 16px;
+            }
+        </style>
+    <!-- <custom-style> -->
+    
+    <div class$="faq-container [[faqContainerClass(expanded)]]">
+        <paper-icon-item on-click="toggleAnswer" role="listitem" class="question-item">
+            <iron-icon icon="mdi:help-circle" slot="item-icon"></iron-icon>
+            <paper-item-body two-line>
+                <div class="question">[[question]]</div>
+                <div secondary>[[category]], [[formatHuman(lastModified)]]</div>
+            </paper-item-body>
+        </paper-icon-item>
+        <iron-collapse id="answerContainer" tabindex="0" opened="{{expanded}}">
+            <div class="answer-item">
+                <slot></slot>
+            <div>
+        </iron-collapse>
+    </div>
+  </template>
+
+  <script>
+    class FaqItem extends Polymer.Element {
+
+      static get is() { return 'faq-item' }
+
+      static get properties() { 
+        return {
+            question: {
+                type: String,
+                value: ''
+            },
+            answer: {
+                type: String,
+                value: null
+            },
+            expanded: {
+                type: Boolean,
+                value: false,
+                notify: true
+            },
+            lastModified: {
+                type: Date,
+                value: null
+            },
+            category: {
+                type: String,
+                value: 'Unknown'
+            }
+        }
+      }
+      faqContainerClass(expanded) {
+        return (!!expanded) ? 'expanded' : '';
+      }
+      toggleAnswer() {
+        this.$.answerContainer.toggle();
+      }
+      isExpanded(b) {
+        return String(b);
+      }
+      formatHuman(date) {
+        return (!!date) ? moment(date).fromNow() : '';
+      }
+    }
+    customElements.define(FaqItem.is, FaqItem);
+  </script>
+</dom-module>

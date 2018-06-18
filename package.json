@@ -1,0 +1,27 @@
+{
+  "name": "help-center",
+  "version": "1.0.0",
+  "description": "This template is a starting point for building apps using a drawer-based layout.  The layout is provided by `app-layout` elements.",
+  "main": "service-worker.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DEXSinc/help-center.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DEXSinc/help-center/issues"
+  },
+  "homepage": "https://github.com/DEXSinc/help-center#readme",
+  "dependencies": {
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0"
+  }
+}
