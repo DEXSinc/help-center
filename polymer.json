@@ -13,12 +13,11 @@
     "assets/**/*",
     "images/**/*",
     "data/**/*",
-    "elements/address-form.html",
-    "elements/dashboard-stats-card.html",
     "node_modules/redux/dist/redux.js",
     "node_modules/redux-thunk/dist/redux-thunk.js",
     "lib/lodash/lodash.js",
-    "lib/webcomponentsjs/webcomponents-lite.min.js",
+    "lib/webcomponentsjs/webcomponents-lite.js",
+    "lib/webcomponentsjs/custom-elements-es5-adapter.js",
     "bower.json"
   ],
   "extraDependencies": [

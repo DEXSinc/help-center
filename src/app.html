@@ -12,15 +12,19 @@
 <link rel="import" href="../lib/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../lib/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../lib/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../lib/paper-card/paper-card.html">
+<link rel="import" href="../lib/paper-item/paper-item.html">
+<link rel="import" href="../lib/wistia-video/wistia-video.html">
+<link rel="import" href="../lib/wistia-video/wistia-video-list.html">
 
 <link rel="import" href="icons.html">
 <link rel="import" href="app-icons.html">
+<link rel="import" href="shared-styles.html">
 
 <link rel="lazy-import" href="views/articles.html">
 <link rel="lazy-import" href="views/faqs.html">
 <link rel="lazy-import" href="views/home.html">
 <link rel="lazy-import" href="views/videos.html">
-<link rel="lazy-import" href="views/view1.html">
 <link rel="lazy-import" href="views/view404.html">
 <link rel="import" href="redux-store.html">
 <link rel="import" href="elements/mdi-icons.html">
@@ -29,7 +33,7 @@
 
   <template>
 
-    <style>
+    <style include="shared-styles">
 
       :host {
         font-family: 'Roboto', 'Noto', sans-serif;

@@ -1,6 +1,6 @@
 <link rel="import" href="../lib/polymer/polymer.html">
 <link rel="import" href="../lib/polymer-redux/polymer-redux.html" >
-
+<script src="./environments/environment.js"></script>
 <script>
     const initialState = {
         loading: false,
@@ -16,8 +16,8 @@
             'videos': 'Video Library',
             'articles': 'Knowledge Articles'
         },
-        imagesServiceUrl: 'https://localhost.acquisio.com',
-        servicesApiRoot: 'https://localhost.acquisio.com/api/v1'
+        imagesServiceUrl: environment.staticUrl || 'https://localhost.acquisio.com',
+        servicesApiRoot: environment.apiUrl || 'https://localhost.acquisio.com/api/v1'
     };
 
     const reducer = (state, action) => {
