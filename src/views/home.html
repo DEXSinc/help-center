@@ -269,7 +269,6 @@
               url="[[servicesApiRoot]]/articles/search"
               method="GET"
               params="[[_getParams(searchValue,2)]]"
-              a-last-response="{{faqResult}}"
               loading="{{faqsLoading}}"
               on-request="_clearFaqs"
               on-response="_onFaqSearchResult"></iron-ajax>
@@ -530,11 +529,10 @@
             value: function() {
               return [
                 'Search^250.^150.^150.^1000',
-                'Link a MCC^1000',
+                'Link an MCC^1000',
                 'Custom Reporting^1000',
                 'Acquisio Social^1000',
-                'BBM^1000',
-                'Acquisio Turing^1000'
+                'BBM^1000'
               ];
             }
           },

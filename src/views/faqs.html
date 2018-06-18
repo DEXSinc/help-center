@@ -144,7 +144,7 @@
         data="{{articleData}}">
     
     <iron-ajax id="faqSearchFeed"
-           url="https://localhost.acquisio.com/api/v1/faqs/{{category}}"
+           url="[[servicesApiRoot]]/faqs/{{category}}"
            method="GET"
            auto
            last-response="{{faqResult}}"
@@ -197,6 +197,10 @@
           appRoot: {
             type: String,
             statePath: 'appRoot'
+          },
+          servicesApiRoot: {
+            type: String,
+            statePath: 'servicesApiRoot'
           },
           imagesServiceUrl: {
             type: String,

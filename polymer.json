@@ -12,19 +12,18 @@
     "src/**/*",
     "assets/**/*",
     "images/**/*",
-    "data/**/*",
-    "node_modules/redux/dist/redux.js",
-    "node_modules/redux-thunk/dist/redux-thunk.js",
-    "lib/lodash/lodash.js",
-    "lib/webcomponentsjs/webcomponents-lite.js",
-    "lib/webcomponentsjs/custom-elements-es5-adapter.js",
-    "bower.json"
+    "data/**/*"
   ],
   "extraDependencies": [
+    "lib/lodash/lodash.js",
+    "node_modules/redux/dist/redux.js",
+    "node_modules/redux-thunk/dist/redux-thunk.js",
+    "lib/webcomponentsjs/*.js",
+    "!lib/webcomponentsjs/gulpfile.js",
     "manifest.json"
   ],
   "lint": {
-    "rules": ["polymer-2-hybrid"],
+    "rules": ["polymer-2"],
     "ignoreWarnings": [
       "multiple-doc-comments",
       "unknown-polymer-behavior",

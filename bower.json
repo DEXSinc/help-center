@@ -15,7 +15,6 @@
     "paper-icon-button": "PolymerElements/paper-icon-button#^2.2.0",
     "polymer": "polymer/polymer#^2.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
-
     "iron-ajax": "PolymerElements/iron-ajax#^2.0.0",
     "iron-localstorage": "PolymerElements/iron-localstorage#^2.0.0",
     "paper-search-input": "vic10us/paper-search-input#^2.0.0",

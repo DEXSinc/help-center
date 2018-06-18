@@ -2,25 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, minimum-scale=0.8, initial-scale=0.8, user-scalable=yes">
+  <meta name="generator" content="Acquisio PWA Starter Kit">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+  
   <title>Acquisio Help Center</title>
+  <meta name="description" content="Acquisio Help Center">
+
+  <base href="/">
+
+  <link rel="icon" href="images/icons/favicon.ico">
   <link rel="shortcut icon" sizes="32x32" href="/images/icons/favicon-32x32.png">
-  <meta name="theme-color" content="#fff">
+  <meta name="theme-color" content="#ffffff">
   <link rel="manifest" href="/manifest.json">
 
-  <script src="/lib/lodash/lodash.js"></script>
-  <script src="/node_modules/redux/dist/redux.js"></script>
-  <script src="/node_modules/redux-thunk/dist/redux-thunk.js"></script>
-  <script src="lib/webcomponentsjs/webcomponents-loader.js"></script>
-  <script>
+  <!-- Add to homescreen for Chrome on Android. Fallback for manifest.json -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Acquisio Help Center">
 
-    if(document.head.createShadowRoot || document.head.attachShadow) {
-      // I can shadow DOM
-      window.Polymer = {lazyRegister: true };
-    } else {
-      window.ShadyDOM = { force: true };
-      window.Polymer = {lazyRegister: true, dom: 'shady'};
-    }
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Acquisio Help Center">
+
+  <!-- Homescreen icons -->
+  <link rel="apple-touch-icon" href="images/icons/icon-48x48.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="images/icons/icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="96x96" href="images/icons/icon-96x96.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="images/icons/icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="images/icons/icon-192x192.png">
+
+  <!-- Tile icon for Windows 8 (144x144 + tile color) -->
+  <meta name="msapplication-TileImage" content="images/icons/icon-144x144.png">
+  <meta name="msapplication-TileColor" content="#3f51b5">
+  <meta name="msapplication-tap-highlight" content="no">
+
+  <script>
 
     String.prototype.replaceAll = function (search, replacement) {
       var target = this;
@@ -28,50 +44,55 @@
     };
 
     // setup Polymer options
-    window.Polymer = {lazyRegister: true, dom: 'shady'};
+    // window.Polymer = {lazyRegister: true, dom: 'shady'};
 
-    // load webcomponents polyfills
-    (function() {
-      if ('registerElement' in document
-          && 'import' in document.createElement('link')
-          && 'content' in document.createElement('template')) {
-        // browser has web components
-      } else {
-        // polyfill web components
-        var e = document.createElement('script');
-        e.src = '/lib/webcomponentsjs/webcomponents-lite.min.js';
-        document.head.appendChild(e);
-      }
-    })();
+    /**
+      * [polymer-root-path]
+      *
+      * By default, we set `Polymer.rootPath` to the server root path (`/`).
+      * Leave this line unchanged if you intend to serve your app from the root
+      * path (e.g., with URLs like `my.domain/` and `my.domain/view1`).
+      *
+      * If you intend to serve your app from a non-root path (e.g., with URLs
+      * like `my.domain/my-app/` and `my.domain/my-app/view1`), edit this line
+      * to indicate the path from which you'll be serving, including leading
+      * and trailing slashes (e.g., `/my-app/`).
+      */
+    window.Polymer = {rootPath: '/'};
 
     // load pre-caching service worker
-    // if ('serviceWorker' in navigator) {
-    //   window.addEventListener('load', function() {
-    //     navigator.serviceWorker.register('/service-worker.js');
-    //   });
-    // }
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js', {
+          scope: Polymer.rootPath,
+        });
+      });
+    }
 
   </script>
 
+  <script src="lib/webcomponentsjs/webcomponents-loader.js"></script>
+  <script src="lib/lodash/lodash.js"></script>
+  <script src="node_modules/redux/dist/redux.js"></script>
+  <script src="node_modules/redux-thunk/dist/redux-thunk.js"></script>
+
   <link rel="import" href="/src/app.html">
-  <custom-style>
-    <style>
-      :host {
-        --bg-gradient: #fafafa;
-      }
-      body {
-        margin: 0;
-        font-family: 'Roboto', 'Noto', sans-serif;
-        line-height: 1.5;
-        min-height: 100vh;
-        background-color: #eee;
-        /* background: linear-gradient(171deg, transparent 65vh, #F3F4F5 65vh, transparent 89vh); */
-      }
-    </style>
-  </custom-style>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+      background-color: #eeeeee;
+    }
+  </style>
 
 </head>
 <body>
     <my-app id="helpcenter" use-hash-routing></my-app>
+    <noscript>
+      Please enable JavaScript to view this website.
+    </noscript>
 </body>
 </html>
